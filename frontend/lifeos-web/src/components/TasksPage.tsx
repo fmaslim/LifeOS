@@ -33,7 +33,7 @@ export function TasksPage({ tasks: initialTasks, state = 'ready' }: TasksPagePro
   const [priority, setPriority] = useState<FilterValue<TaskPriority>>('all')
   const [domain, setDomain] = useState<FilterValue<TaskDomain>>('all')
   const [due, setDue] = useState<'all' | 'overdue' | 'today' | 'upcoming' | 'none'>('all')
-  const [editingTask, setEditingTask] = useState<Task | null | undefined>(undefined)
+  const [editingTask, setEditingTask] = useState<Task | null | undefined>(() => window.location.hash.includes('action=new') ? null : undefined)
   const today = localDate()
   const filteredTasks = useMemo(() => tasks.filter(task => (status === 'all' || task.status === status) && (priority === 'all' || task.priority === priority) && (domain === 'all' || task.domain === domain) && (due === 'all' || (due === 'overdue' && !!task.dueDate && task.dueDate < today && task.status !== 'completed') || (due === 'today' && task.dueDate === today) || (due === 'upcoming' && !!task.dueDate && task.dueDate > today) || (due === 'none' && !task.dueDate))), [tasks, status, priority, domain, due, today])
   const activeCount = tasks.filter(task => task.status !== 'completed').length

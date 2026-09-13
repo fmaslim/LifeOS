@@ -32,6 +32,7 @@ import { CalendarPage } from './components/CalendarPage'
 import { MockCalendarService } from './services/MockCalendarService'
 import { NotesPage } from './components/NotesPage'
 import { MockNoteService } from './services/MockNoteService'
+import { CommandPalette } from './components/CommandPalette'
 
 type IconName = DashboardIcon
 
@@ -67,14 +68,14 @@ function Sidebar({ activeRoute }: { activeRoute: RouteName }) { return <aside cl
 function SummaryCard({ card }: { card: typeof cards[number] }) { return <article className="summary-card"><div className={`card-icon ${card.tone}`}><Icon name={card.icon} /></div><p>{card.label}</p><strong>{card.value}</strong><span>{card.detail}</span></article> }
 function App() {
   const readRoute = (): RouteName => {
-    const route = window.location.hash.replace('#/', '') as RouteName
+    const route = window.location.hash.replace('#/', '').split('?')[0] as RouteName
     return nav.some(item => item.route === route) ? route : 'dashboard'
   }
   const [route, setRoute] = useState<RouteName>(readRoute)
   const [activeOperations, setActiveOperations] = useState(operations)
   useEffect(() => { const updateRoute = () => setRoute(readRoute()); window.addEventListener('hashchange', updateRoute); return () => window.removeEventListener('hashchange', updateRoute) }, [])
   const page = shellData.placeholderPages.find(item => item.route === route)
-  const topbar = <header className="topbar"><div className="mobile-brand"><span className="brand-mark">L</span>LifeOS</div><div className="search"><Icon name="search" size={17} />Search your workspace <kbd>⌘ K</kbd></div><div className="header-actions"><button className="icon-button" aria-label="More options"><Icon name="more" /></button><span className="avatar">{shellData.profile.initials}</span></div></header>
+  const topbar = <header className="topbar"><div className="mobile-brand"><span className="brand-mark">L</span>LifeOS</div><CommandPalette navigation={nav} /><div className="header-actions"><button className="icon-button" aria-label="More options"><Icon name="more" /></button><span className="avatar">{shellData.profile.initials}</span></div></header>
   if ((route as RouteName) === 'automations') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<AutomationsPage data={automationsData} icon={Icon} /></main></div>
   if (route === 'automations') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<AutomationsPage data={automationsData} icon={Icon} /></main></div>
   if (route === 'jarvis') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<JarvisPage data={jarvisData} icon={Icon} /></main></div>
