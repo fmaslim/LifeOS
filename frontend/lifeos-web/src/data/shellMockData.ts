@@ -4,7 +4,7 @@ import type { ShellData } from '../models/shell'
 export const shellMockData: ShellData = {
   profile: { initials: 'FM', name: 'Frank Maslowski', workspaceName: 'Personal workspace' },
   navigation: [
-    { label: 'Dashboard', route: 'dashboard', icon: 'grid' }, { label: 'Today', route: 'today', icon: 'check' }, { label: 'Tasks', route: 'tasks', icon: 'check' }, { label: 'Automations', route: 'automations', icon: 'bolt' }, { label: 'Content', route: 'content', icon: 'play' }, { label: 'Jarvis', route: 'jarvis', icon: 'sparkles' }, { label: 'DocIQ', route: 'dociq', icon: 'file' }, { label: 'Finances', route: 'finances', icon: 'wallet' }, { label: 'Home', route: 'home', icon: 'home' }, { label: 'Health', route: 'health', icon: 'heart' }, { label: 'Settings', route: 'settings', icon: 'settings' },
+    { label: 'Dashboard', route: 'dashboard', icon: 'grid' }, { label: 'Today', route: 'today', icon: 'check' }, { label: 'Tasks', route: 'tasks', icon: 'check' }, { label: 'Goals', route: 'goals', icon: 'target' }, { label: 'Automations', route: 'automations', icon: 'bolt' }, { label: 'Content', route: 'content', icon: 'play' }, { label: 'Jarvis', route: 'jarvis', icon: 'sparkles' }, { label: 'DocIQ', route: 'dociq', icon: 'file' }, { label: 'Finances', route: 'finances', icon: 'wallet' }, { label: 'Home', route: 'home', icon: 'home' }, { label: 'Health', route: 'health', icon: 'heart' }, { label: 'Settings', route: 'settings', icon: 'settings' },
   ],
   placeholderPages: [
     { route: 'automations', eyebrow: 'Workflow control', title: 'Automations', description: 'Monitor, organize, and build the systems that keep LifeOS moving.', status: 'Automation workspace coming soon', icon: 'bolt' },
