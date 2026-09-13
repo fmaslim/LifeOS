@@ -1,0 +1,1 @@
+export type ContactStatus='active'|'follow-up'|'inactive';export interface Contact{id:string;name:string;company?:string;relationship:string;notes:string;lastContact:string;nextFollowUp?:string;tags:string[];status:ContactStatus}export interface ContactData{contacts:Contact[]}
