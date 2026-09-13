@@ -1,0 +1,11 @@
+import type { DocIQData } from '../models/dociq'
+
+// Frontend-only DocIQ fixture. Keep all display values here until an API is introduced.
+export const docIQMockData: DocIQData = {
+  updatedLabel: 'Last updated just now',
+  metrics: [{ label: 'Documents indexed', value: '1,284', detail: '+24 this week', icon: 'files', tone: 'violet' }, { label: 'In processing', value: '08', detail: 'Estimated 4 min remaining', icon: 'scan', tone: 'blue' }, { label: 'Analysis coverage', value: '96%', detail: '1,233 documents analyzed', icon: 'check', tone: 'green' }, { label: 'Open issues', value: '07', detail: '3 need attention today', icon: 'alert', tone: 'rose' }],
+  recentAnalyses: [{ name: '2026 Commercial Lease Renewal', type: 'Lease agreement', updatedAt: '12 min ago', state: 'Processed', score: '94%' }, { name: 'Q3 Property Insurance Review', type: 'Insurance policy', updatedAt: '38 min ago', state: 'Needs review', score: '82%' }, { name: 'Vendor Services Agreement', type: 'Service contract', updatedAt: '1 hr ago', state: 'Processed', score: '91%' }, { name: 'Tenant Move-in Checklist', type: 'Operations', updatedAt: '2 hrs ago', state: 'Processing', score: '—' }],
+  risks: [{ title: 'Auto-renewal clause approaching', document: '2026 Commercial Lease Renewal', severity: 'High', detail: 'Notice window opens in 14 days.' }, { title: 'Coverage gap detected', document: 'Q3 Property Insurance Review', severity: 'Medium', detail: 'Water damage limit is below target.' }, { title: 'Missing signature page', document: 'Vendor Services Agreement', severity: 'Low', detail: 'Final execution page was not found.' }],
+  actions: [{ title: 'Review 3 flagged clauses', detail: 'Prioritized by deadline and severity.', action: 'Open review', icon: 'review' }, { title: 'Organize 12 uncategorized files', detail: 'DocIQ has suggested destinations.', action: 'Review files', icon: 'folder' }, { title: 'Add documents to DocIQ', detail: 'Drop files here or choose from your device.', action: 'Upload files', icon: 'upload' }],
+  systemStatus: [{ name: 'Document ingestion', detail: 'All queues clear', status: 'Operational' }, { name: 'Analysis engine', detail: '8 documents in progress', status: 'Operational' }, { name: 'Risk monitoring', detail: 'Daily scan scheduled for 6:00 AM', status: 'Monitoring' }],
+}
