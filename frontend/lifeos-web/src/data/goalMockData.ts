@@ -1,0 +1,12 @@
+import type { GoalData } from '../models/goal'
+
+// Centralized frontend-only goal data. No accounts, APIs, or personal integrations are used.
+export const goalMockData: GoalData = {
+  goals: [
+    { id: 'goal-business', title: 'Build a repeatable client pipeline', description: 'Create a dependable rhythm for qualified conversations and thoughtful follow-up.', area: 'Business', status: 'active', targetDate: '2026-12-31', milestones: [{ id: 'b1', title: 'Define ideal client profile', completed: true }, { id: 'b2', title: 'Publish the referral playbook', completed: true }, { id: 'b3', title: 'Reach 12 qualified conversations', completed: false }, { id: 'b4', title: 'Standardize monthly review', completed: false }] },
+    { id: 'goal-content', title: 'Ship a focused content system', description: 'Turn useful ideas into a consistent library of clear, durable content.', area: 'Content', status: 'active', targetDate: '2026-11-15', milestones: [{ id: 'c1', title: 'Choose three content pillars', completed: true }, { id: 'c2', title: 'Create a 6-week calendar', completed: false }, { id: 'c3', title: 'Publish 12 cornerstone pieces', completed: false }] },
+    { id: 'goal-finance', title: 'Strengthen the financial runway', description: 'Build more flexibility through a clear cash reserve and automated saving.', area: 'Finance', status: 'active', targetDate: '2027-03-01', milestones: [{ id: 'f1', title: 'Set the reserve target', completed: true }, { id: 'f2', title: 'Automate monthly transfers', completed: true }, { id: 'f3', title: 'Reach 50% of reserve', completed: true }, { id: 'f4', title: 'Complete the full reserve', completed: false }] },
+    { id: 'goal-home', title: 'Finish the home refresh', description: 'Make the shared spaces simpler, calmer, and ready for everyday life.', area: 'Home', status: 'paused', targetDate: '2027-01-20', milestones: [{ id: 'h1', title: 'Set the room priorities', completed: true }, { id: 'h2', title: 'Finalize the project budget', completed: false }, { id: 'h3', title: 'Complete the entry and office', completed: false }] },
+    { id: 'goal-learning', title: 'Complete the leadership program', description: 'Develop stronger coaching and decision-making habits through deliberate practice.', area: 'Learning', status: 'completed', targetDate: '2026-08-30', milestones: [{ id: 'l1', title: 'Finish the core curriculum', completed: true }, { id: 'l2', title: 'Lead three practice sessions', completed: true }, { id: 'l3', title: 'Write the learning recap', completed: true }] },
+  ],
+}
