@@ -1,0 +1,1 @@
+import{contactMockData}from'../data/contactMockData';import type{ContactData}from'../models/contact';import type{ContactService}from'./ContactService';export class MockContactService implements ContactService{getContactData():ContactData{return contactMockData}}
