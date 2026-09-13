@@ -34,6 +34,8 @@ import { NotesPage } from './components/NotesPage'
 import { MockNoteService } from './services/MockNoteService'
 import { CommandPalette } from './components/CommandPalette'
 import { MockSearchService } from './services/MockSearchService'
+import { ActivityPage } from './components/ActivityPage'
+import { MockActivityService } from './services/MockActivityService'
 
 type IconName = DashboardIcon
 
@@ -55,6 +57,7 @@ const goalData = new MockGoalService().getGoalData()
 const calendarData = new MockCalendarService().getCalendarData()
 const noteData = new MockNoteService().getNoteData()
 const searchService = new MockSearchService()
+const activityData = new MockActivityService().getActivityData()
 const nav = shellData.navigation
 const cards = [dashboardData.automationSummary, dashboardData.youtubePipelineSummary, dashboardData.jarvisSummary, dashboardData.docIQSummary, dashboardData.rentalIncomeSummary, dashboardData.systemHealthSummary]
 const operations = dashboardData.dailyOperations
@@ -87,6 +90,7 @@ function App() {
   if (route === 'health') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<HealthPage data={healthData} icon={({ name, size }) => <Icon name={name} size={size ?? 18} />} /></main></div>
   if (route === 'today') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<TodayPage data={todayData} icon={({ name, size }) => <Icon name={name} size={size ?? 18} />} /></main></div>
   if (route === 'calendar') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<CalendarPage data={calendarData} /></main></div>
+  if (route === 'activity') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<ActivityPage data={activityData} /></main></div>
   if (route === 'notes') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<NotesPage data={noteData} /></main></div>
   if (route === 'tasks') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<TasksPage tasks={taskData.tasks} /></main></div>
   if (route === 'goals') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<GoalsPage data={goalData} /></main></div>
