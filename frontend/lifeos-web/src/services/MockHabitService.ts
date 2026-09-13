@@ -1,0 +1,1 @@
+import { habitMockData } from '../data/habitMockData'; import type { HabitData } from '../models/habit'; import type { HabitService } from './HabitService'; export class MockHabitService implements HabitService { getHabitData(): HabitData { return habitMockData } }
