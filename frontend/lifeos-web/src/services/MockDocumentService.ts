@@ -1,0 +1,1 @@
+import{documentMockData}from'../data/documentMockData';import type{DocumentData}from'../models/document';import type{DocumentService}from'./DocumentService';export class MockDocumentService implements DocumentService{getDocumentData():DocumentData{return documentMockData}}
