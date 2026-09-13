@@ -17,16 +17,27 @@ $labels = @(
 )
 
 function Invoke-RequiredCommand {
-  param([string] $FilePath, [string[]] $Arguments, [string] $WorkingDirectory = $repoRoot)
+  param([string] $FilePath, [string[]] $CommandArguments, [string] $WorkingDirectory = $repoRoot)
   Push-Location $WorkingDirectory
-  try { & $FilePath @Arguments; if ($LASTEXITCODE -ne 0) { throw "Command failed: $FilePath $($Arguments -join ' ')" } }
+  try { & $FilePath @CommandArguments; if ($LASTEXITCODE -ne 0) { throw "Command failed: $FilePath $($CommandArguments -join ' ')" } }
+  finally { Pop-Location }
+}
+
+function Invoke-CodingAgent {
+  param([string] $Executable, [string] $WorkingDirectory, [string] $Prompt)
+  Push-Location $repoRoot
+  try {
+    # Passing the prompt through stdin preserves its complete multi-line issue body as one input.
+    $Prompt | & $Executable exec '--cd' $WorkingDirectory '--sandbox' 'workspace-write' '-'
+    if ($LASTEXITCODE -ne 0) { throw "Coding agent failed with exit code $LASTEXITCODE." }
+  }
   finally { Pop-Location }
 }
 
 function Ensure-Labels {
   foreach ($label in $labels) {
     # --force updates the expected state without touching any unrelated repository labels.
-    Invoke-RequiredCommand 'gh' @('label', 'create', $label.Name, '--color', $label.Color, '--description', $label.Description, '--force')
+    Invoke-RequiredCommand -FilePath 'gh' -CommandArguments @('label', 'create', $label.Name, '--color', $label.Color, '--description', $label.Description, '--force')
   }
 }
 
@@ -48,22 +59,48 @@ function Invoke-ProjectChecks {
   foreach ($packageFile in $packageFiles) {
     $packageDirectory = $packageFile.Directory.FullName
     $package = Get-Content $packageFile.FullName -Raw | ConvertFrom-Json
-    if (-not (Test-Path (Join-Path $packageDirectory 'node_modules'))) { Write-Host "Installing dependencies: $packageDirectory"; Invoke-RequiredCommand 'npm' @('install') $packageDirectory }
-    if ($package.scripts.build) { Invoke-RequiredCommand 'npm' @('run', 'build') $packageDirectory; Write-Host 'Build passed.' }
-    if ($package.scripts.lint) { Invoke-RequiredCommand 'npm' @('run', 'lint') $packageDirectory; Write-Host 'Lint passed.' }
-    if ($package.scripts.test) { Invoke-RequiredCommand 'npm' @('run', 'test', '--', '--run') $packageDirectory; Write-Host 'Tests passed.' }
+    if (-not (Test-Path (Join-Path $packageDirectory 'node_modules'))) { Write-Host "Installing dependencies: $packageDirectory"; Invoke-RequiredCommand -FilePath 'npm' -CommandArguments @('install') -WorkingDirectory $packageDirectory }
+    if ($package.scripts.build) { Invoke-RequiredCommand -FilePath 'npm' -CommandArguments @('run', 'build') -WorkingDirectory $packageDirectory; Write-Host 'Build passed.' }
+    if ($package.scripts.lint) { Invoke-RequiredCommand -FilePath 'npm' -CommandArguments @('run', 'lint') -WorkingDirectory $packageDirectory; Write-Host 'Lint passed.' }
+    if ($package.scripts.test) { Invoke-RequiredCommand -FilePath 'npm' -CommandArguments @('run', 'test', '--', '--run') -WorkingDirectory $packageDirectory; Write-Host 'Tests passed.' }
   }
 }
 
 function Mark-Blocked {
   param([int] $IssueNumber, [string] $Reason)
   $comment = "Autonomous issue runner blocked this issue.``n``nReason: $Reason``n``nNo failing validation step was silently ignored. A human decision is required before relabeling this issue as `ready`."
-  Invoke-RequiredCommand 'gh' @('issue', 'edit', "$IssueNumber", '--remove-label', 'in-progress', '--add-label', 'blocked', '--comment', $comment)
+  try {
+    Invoke-RequiredCommand -FilePath 'gh' -CommandArguments @('issue', 'edit', "$IssueNumber", '--remove-label', 'in-progress', '--add-label', 'blocked')
+    Write-Host "Issue #$IssueNumber labeled blocked."
+  }
+  catch { Write-Warning "GitHub label update failed for issue #${IssueNumber}: $($_.Exception.Message)" }
+  try {
+    Invoke-RequiredCommand -FilePath 'gh' -CommandArguments @('issue', 'comment', "$IssueNumber", '--body', $comment)
+    Write-Host "Blocker comment posted for issue #$IssueNumber."
+  }
+  catch { Write-Warning "GitHub comment failed for issue #${IssueNumber}; original failure remains: $Reason. GitHub CLI error: $($_.Exception.Message)" }
 }
 
 function Complete-Issue {
   param([int] $IssueNumber)
-  Invoke-RequiredCommand 'gh' @('issue', 'edit', "$IssueNumber", '--remove-label', 'in-progress', '--add-label', 'done', '--close')
+  Invoke-RequiredCommand -FilePath 'gh' -CommandArguments @('issue', 'edit', "$IssueNumber", '--remove-label', 'in-progress', '--add-label', 'done')
+  Invoke-RequiredCommand -FilePath 'gh' -CommandArguments @('issue', 'close', "$IssueNumber")
+}
+
+function Ensure-IssueCommit {
+  param([string] $WorkingDirectory, [string] $BaselineRef, [int] $IssueNumber)
+  $commitCount = [int](& git -C $WorkingDirectory rev-list --count "$BaselineRef..HEAD")
+  if ($commitCount -gt 0) { return }
+
+  $changedFiles = @(& git -C $WorkingDirectory diff --name-only; & git -C $WorkingDirectory ls-files --others --exclude-standard) | Sort-Object -Unique
+  if ($changedFiles.Count -eq 0) { throw 'The agent completed without creating a commit or any changes.' }
+  $protectedFiles = $changedFiles | Where-Object { $_ -match '(^|/)(\.env($|\.)|.*secret.*|.*credential.*)' }
+  if ($protectedFiles) { throw "Refusing to commit protected files automatically: $($protectedFiles -join ', ')" }
+
+  # The Windows sandbox identity cannot write this worktree's Git metadata. The host runner commits only validated, non-protected work.
+  Invoke-RequiredCommand -FilePath 'git' -CommandArguments @('-C', $WorkingDirectory, 'add', '--all')
+  Invoke-RequiredCommand -FilePath 'git' -CommandArguments @('-C', $WorkingDirectory, 'commit', '-m', "feat: complete issue #$IssueNumber")
+  Write-Host 'Commit created by host runner after validation.'
 }
 
 function Resolve-CodingAgentCommand {
@@ -124,9 +161,9 @@ while ($processed -lt $MaxIssues) {
 
   try {
     if (Test-Path $worktree) { throw "Worktree already exists: $worktree. Inspect it before retrying this issue." }
-    Invoke-RequiredCommand 'gh' @('issue', 'edit', "$issueNumber", '--remove-label', 'ready', '--add-label', 'in-progress')
-    Invoke-RequiredCommand 'git' @('fetch', 'origin')
-    Invoke-RequiredCommand 'git' @('worktree', 'add', '-b', $branch, $worktree, $baselineRef)
+    Invoke-RequiredCommand -FilePath 'gh' -CommandArguments @('issue', 'edit', "$issueNumber", '--remove-label', 'ready', '--add-label', 'in-progress')
+    Invoke-RequiredCommand -FilePath 'git' -CommandArguments @('fetch', 'origin')
+    Invoke-RequiredCommand -FilePath 'git' -CommandArguments @('worktree', 'add', '-b', $branch, $worktree, $baselineRef)
     Write-Host "Branch created: $branch"
     $issueDetails = & gh issue view $issueNumber --json title,body
     if ($LASTEXITCODE -ne 0) { throw 'Unable to read the full issue.' }
@@ -139,23 +176,22 @@ $issueDetails
 Implement the issue completely in this worktree. Do not modify secrets, credentials, production infrastructure, authentication, databases, or external systems. Stop without committing if the requested change is destructive or ambiguous and explain why in your final response. Run the relevant checks and fix every failure. When successful, commit the completed change with a concise message. Do not push or edit GitHub issue labels; the runner handles those steps.
 "@
     Write-Host 'Agent running.'
-    Invoke-RequiredCommand $AgentCommand @('exec', '--cd', $worktree, '--sandbox', 'workspace-write', '--ask-for-approval', 'never', $agentPrompt) $repoRoot
+    Invoke-CodingAgent -Executable $AgentCommand -WorkingDirectory $worktree -Prompt $agentPrompt
     for ($validationAttempt = 1; $validationAttempt -le 2; $validationAttempt++) {
       try { Invoke-ProjectChecks $worktree; break }
       catch {
         if ($validationAttempt -eq 2) { throw }
         $repairPrompt = "Validation failed for GitHub issue #$issueNumber. Fix the failure below in the current worktree, rerun the relevant checks, and amend or create the required commit. Do not push. Failure: $($_.Exception.Message)"
         Write-Host 'Validation failed; asking agent to fix and retry once.'
-        Invoke-RequiredCommand $AgentCommand @('exec', '--cd', $worktree, '--sandbox', 'workspace-write', '--ask-for-approval', 'never', $repairPrompt) $repoRoot
+        Invoke-CodingAgent -Executable $AgentCommand -WorkingDirectory $worktree -Prompt $repairPrompt
       }
     }
-    $commitCount = [int](& git -C $worktree rev-list --count "$baselineRef..HEAD")
-    if ($commitCount -lt 1) { throw 'The agent completed without creating a commit.' }
+    Ensure-IssueCommit -WorkingDirectory $worktree -BaselineRef $baselineRef -IssueNumber $issueNumber
     Write-Host 'Commit created.'
-    Invoke-RequiredCommand 'git' @('-C', $worktree, 'push', '--set-upstream', 'origin', $branch)
+    Invoke-RequiredCommand -FilePath 'git' -CommandArguments @('-C', $worktree, 'push', '--set-upstream', 'origin', $branch)
     Write-Host 'Branch pushed.'
     Complete-Issue $issueNumber
-    Invoke-RequiredCommand 'git' @('worktree', 'remove', $worktree)
+    Invoke-RequiredCommand -FilePath 'git' -CommandArguments @('worktree', 'remove', $worktree)
     Write-Host "Issue completed: #$issueNumber."
   }
   catch {
