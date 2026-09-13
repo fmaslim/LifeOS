@@ -25,7 +25,7 @@ export function NotesPage({ data }: { data: NoteData }) {
   const [view, setView] = useState<View>('inbox')
   const [query, setQuery] = useState('')
   const [domain, setDomain] = useState<NoteDomain | 'All'>('All')
-  const [editing, setEditing] = useState<Note | null | undefined>(undefined)
+  const [editing, setEditing] = useState<Note | null | undefined>(() => window.location.hash.includes('action=new') ? null : undefined)
   const filtered = useMemo(() => { const needle = query.trim().toLowerCase(); return notes.filter(note => (view === 'all' || (view === 'inbox' ? note.inbox : note.pinned)) && (domain === 'All' || note.domain === domain) && (!needle || `${note.title} ${note.body} ${note.tags.join(' ')}`.toLowerCase().includes(needle))).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)) }, [notes, view, query, domain])
   const save = (draft: Draft) => { const now = new Date().toISOString(); const normalized = { title: draft.title.trim() || 'Untitled note', body: draft.body.trim(), domain: draft.domain, tags: draft.tags.split(',').map(tag => tag.trim()).filter(Boolean), updatedAt: now }; if (editing) setNotes(current => current.map(note => note.id === editing.id ? { ...note, ...normalized } : note)); else setNotes(current => [{ ...normalized, id: `note-${Date.now()}`, pinned: false, inbox: true, createdAt: now }, ...current]); setEditing(undefined) }
   return <div className="dashboard notes-page"><section className="notes-hero"><div><p className="eyebrow">Capture & remember</p><h1>Notes</h1><p className="subtitle">A quiet place for ideas, decisions, and follow-ups.</p></div><button className="primary-button" onClick={() => setEditing(null)}>+ Quick capture</button></section>
