@@ -1,4 +1,4 @@
-export type DashboardIcon = 'grid' | 'bolt' | 'play' | 'sparkles' | 'file' | 'wallet' | 'home' | 'heart' | 'settings' | 'arrow' | 'more' | 'check' | 'clock' | 'search' | 'files' | 'scan' | 'alert' | 'review' | 'folder' | 'upload'
+export type DashboardIcon = 'grid' | 'bolt' | 'play' | 'sparkles' | 'file' | 'wallet' | 'home' | 'heart' | 'settings' | 'arrow' | 'more' | 'check' | 'clock' | 'search' | 'files' | 'scan' | 'alert' | 'review' | 'folder' | 'upload' | 'users' | 'send' | 'mail' | 'chart' | 'refresh' | 'chevron'
 export type DashboardTone = 'violet' | 'rose' | 'amber' | 'blue' | 'green' | 'teal'
 
 export interface AutomationSummary { label: string; value: string; detail: string; icon: DashboardIcon; tone: DashboardTone }
