@@ -1,0 +1,1 @@
+export type LearningStatus='planned'|'active'|'completed';export interface LearningMilestone{id:string;title:string;completed:boolean}export interface LearningItem{id:string;title:string;kind:'Course'|'Skill'|'Study plan';status:LearningStatus;progress:number;nextAction:string;resources:string[];milestones:LearningMilestone[]}export interface LearningData{items:LearningItem[]}

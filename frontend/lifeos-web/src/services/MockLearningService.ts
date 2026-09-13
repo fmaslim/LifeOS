@@ -1,0 +1,1 @@
+import{learningMockData}from'../data/learningMockData';import type{LearningData}from'../models/learning';import type{LearningService}from'./LearningService';export class MockLearningService implements LearningService{getLearningData():LearningData{return learningMockData}}
