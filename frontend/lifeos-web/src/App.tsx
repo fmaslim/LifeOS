@@ -7,6 +7,7 @@ import { ContentPage } from './components/ContentPage'
 import { PlaceholderPage } from './components/PlaceholderPage'
 import { DocIQPage } from './components/DocIQPage'
 import { FinancesPage } from './components/FinancesPage'
+import { HomePage } from './components/HomePage'
 import type { DashboardIcon } from './models/dashboard'
 import type { RouteName } from './models/shell'
 import { MockDashboardService } from './services/MockDashboardService'
@@ -16,6 +17,7 @@ import { MockContentService } from './services/MockContentService'
 import { MockShellService } from './services/MockShellService'
 import { MockDocIQService } from './services/MockDocIQService'
 import { MockFinancesService } from './services/MockFinancesService'
+import { MockHomeService } from './services/MockHomeService'
 
 type IconName = DashboardIcon
 
@@ -28,6 +30,7 @@ const automationsData = new MockAutomationsService().getAutomationsData()
 const jarvisData = new MockJarvisService().getJarvisData()
 const contentService = new MockContentService()
 const financesData = new MockFinancesService().getFinancesData()
+const homeData = new MockHomeService().getHomeData()
 const nav = shellData.navigation
 const cards = [dashboardData.automationSummary, dashboardData.youtubePipelineSummary, dashboardData.jarvisSummary, dashboardData.docIQSummary, dashboardData.rentalIncomeSummary, dashboardData.systemHealthSummary]
 const operations = dashboardData.dailyOperations
@@ -55,6 +58,7 @@ function App() {
   if (route === 'jarvis') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<JarvisPage data={jarvisData} icon={Icon} /></main></div>
   if (route === 'dociq') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<DocIQPage data={docIQData} icon={name => <Icon name={name} size={18} />} /></main></div>
   if (route === 'finances') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<FinancesPage data={financesData} icon={({ name, size }) => <Icon name={name} size={size ?? 18} />} /></main></div>
+  if (route === 'home') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<HomePage data={homeData} icon={({ name, size }) => <Icon name={name} size={size ?? 18} />} /></main></div>
   if (route === 'content') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<ContentPage contentService={contentService} /></main></div>
   if (route !== 'dashboard' && page) return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<PlaceholderPage page={page} icon={<Icon name={page.icon} size={27} />} /></main></div>
   return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<div className="dashboard"><section className="welcome"><div><p className="eyebrow">{dashboardData.currentDateLabel}</p><h1>LifeOS</h1><p className="subtitle">Your personal operating system</p></div><button className="primary-button">View all automations <Icon name="arrow" size={17} /></button></section><section className="summary-grid">{cards.map(c => <SummaryCard card={c} key={c.label} />)}</section><div className="content-grid"><section className="panel"><div className="panel-heading"><div><p className="eyebrow">Focus for today</p><h2>Today's Operations</h2></div><button className="text-button">View all <Icon name="arrow" size={16} /></button></div>{activeOperations.length ? <div className="operation-list">{activeOperations.map((o, i) => <article className="operation" key={o.title}><button className="check-button" aria-label={`Complete ${o.title}`} onClick={() => setActiveOperations(current => current.filter(item => item.title !== o.title))}><Icon name="check" size={14} /></button><div className={`small-icon ${o.tone}`}><Icon name={o.icon} size={18} /></div><div className="operation-copy"><h3>{o.title}</h3><p>{o.meta}</p></div><span className="operation-count">0{i + 1}</span></article>)}</div> : <EmptyState title="You're all caught up" description="Today's operations are complete. New priorities will appear here as they are scheduled." action={{ label: 'Restore today\'s list', onClick: () => setActiveOperations(operations) }} />}</section><section className="panel"><div className="panel-heading"><div><p className="eyebrow">System log</p><h2>Recent Activity</h2></div><button className="text-button">See all <Icon name="arrow" size={16} /></button></div><div className="activity-list">{activity.map(a => <article className="activity" key={a.title}><div className={`small-icon ${a.tone}`}><Icon name={a.icon} size={17} /></div><div><h3>{a.title}</h3><p>{a.description}</p></div><time><Icon name="clock" size={13} />{a.time}</time></article>)}</div><button className="activity-footer">Open activity center <Icon name="arrow" size={16} /></button></section></div></div></main></div>
