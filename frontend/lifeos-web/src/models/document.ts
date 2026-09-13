@@ -1,0 +1,1 @@
+export type DocumentStatus='active'|'review'|'archived';export interface DocumentRecord{id:string;title:string;category:string;source:string;tags:string[];status:DocumentStatus;relatedProject?:string;reference?:string;updatedAt:string}export interface DocumentData{documents:DocumentRecord[]}
