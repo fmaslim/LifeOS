@@ -1,0 +1,6 @@
+import type { ProjectData } from '../models/project'
+export const projectMockData: ProjectData = { projects: [
+  { id: 'project-lifeos', title: 'LifeOS', description: 'Build the calm operating system for work and life.', domain: 'Product', status: 'active', targetDate: '2026-10-15', progress: 48, linkedTaskIds: ['task-1', 'task-3'], milestones: [{ id: 'p1-1', title: 'Core workspaces', completed: true }, { id: 'p1-2', title: 'Persistence foundation', completed: true }, { id: 'p1-3', title: 'Advanced workflows', completed: false }] },
+  { id: 'project-content', title: 'Corporate Collapse automation', description: 'A repeatable pipeline from research to publication.', domain: 'Content', status: 'active', targetDate: '2026-11-01', progress: 65, linkedTaskIds: ['task-2'], milestones: [{ id: 'p2-1', title: 'Short generator', completed: true }, { id: 'p2-2', title: 'Long-form package', completed: true }, { id: 'p2-3', title: 'Publishing handoff', completed: false }] },
+  { id: 'project-home', title: 'ADU planning', description: 'Define a durable, private, premium rental unit.', domain: 'Home', status: 'planning', targetDate: '2027-03-31', progress: 22, linkedTaskIds: [], milestones: [{ id: 'p3-1', title: 'Scope and priorities', completed: true }, { id: 'p3-2', title: 'Contractor bids', completed: false }] },
+] }
