@@ -9,7 +9,6 @@ export const shellMockData: ShellData = {
   placeholderPages: [
     { route: 'automations', eyebrow: 'Workflow control', title: 'Automations', description: 'Monitor, organize, and build the systems that keep LifeOS moving.', status: 'Automation workspace coming soon', icon: 'bolt' },
     { route: 'content', eyebrow: 'Creative engine', title: 'Content', description: 'Plan and manage your content pipeline from one focused workspace.', status: 'Content workspace coming soon', icon: 'play' },
-    { route: 'jarvis', eyebrow: 'Intelligence layer', title: 'Jarvis', description: 'Your prospecting and research assistant, ready for future integrations.', status: 'Jarvis workspace coming soon', icon: 'sparkles' },
     { route: 'dociq', eyebrow: 'Knowledge base', title: 'DocIQ', description: 'Keep the documents and knowledge that matter organized and accessible.', status: 'DocIQ workspace coming soon', icon: 'file' },
     { route: 'finances', eyebrow: 'Financial overview', title: 'Finances', description: 'A clear home for your income, properties, and financial decisions.', status: 'Finance workspace coming soon', icon: 'wallet' },
     { route: 'home', eyebrow: 'Household system', title: 'Home', description: 'Bring your household priorities and operations into one calm workspace.', status: 'Home workspace coming soon', icon: 'home' },
