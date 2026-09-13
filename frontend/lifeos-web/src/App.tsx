@@ -22,6 +22,8 @@ import { MockHealthService } from './services/MockHealthService'
 import { HealthPage } from './components/HealthPage'
 import { SettingsPage } from './components/SettingsPage'
 import { MockSettingsService } from './services/MockSettingsService'
+import { MockTodayService } from './services/MockTodayService'
+import { TodayPage } from './components/TodayPage'
 
 type IconName = DashboardIcon
 
@@ -37,6 +39,7 @@ const financesData = new MockFinancesService().getFinancesData()
 const homeData = new MockHomeService().getHomeData()
 const healthData = new MockHealthService().getHealthData()
 const settingsData = new MockSettingsService().getSettingsData()
+const todayData = new MockTodayService().getTodayData()
 const nav = shellData.navigation
 const cards = [dashboardData.automationSummary, dashboardData.youtubePipelineSummary, dashboardData.jarvisSummary, dashboardData.docIQSummary, dashboardData.rentalIncomeSummary, dashboardData.systemHealthSummary]
 const operations = dashboardData.dailyOperations
@@ -66,6 +69,7 @@ function App() {
   if (route === 'finances') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<FinancesPage data={financesData} icon={({ name, size }) => <Icon name={name} size={size ?? 18} />} /></main></div>
   if (route === 'home') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<HomePage data={homeData} icon={({ name, size }) => <Icon name={name} size={size ?? 18} />} /></main></div>
   if (route === 'health') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<HealthPage data={healthData} icon={({ name, size }) => <Icon name={name} size={size ?? 18} />} /></main></div>
+  if (route === 'today') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<TodayPage data={todayData} icon={({ name, size }) => <Icon name={name} size={size ?? 18} />} /></main></div>
   if (route === 'settings') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<SettingsPage data={settingsData} icon={({ name, size }) => <Icon name={name} size={size ?? 18} />} /></main></div>
   if (route === 'content') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<ContentPage contentService={contentService} /></main></div>
   if (route !== 'dashboard' && page) return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<PlaceholderPage page={page} icon={<Icon name={page.icon} size={27} />} /></main></div>
