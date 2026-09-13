@@ -47,7 +47,7 @@ function App() {
   useEffect(() => { const updateRoute = () => setRoute(readRoute()); window.addEventListener('hashchange', updateRoute); return () => window.removeEventListener('hashchange', updateRoute) }, [])
   const page = shellData.placeholderPages.find(item => item.route === route)
   const topbar = <header className="topbar"><div className="mobile-brand"><span className="brand-mark">L</span>LifeOS</div><div className="search"><Icon name="search" size={17} />Search your workspace <kbd>⌘ K</kbd></div><div className="header-actions"><button className="icon-button" aria-label="More options"><Icon name="more" /></button><span className="avatar">{shellData.profile.initials}</span></div></header>
-  if (route === 'automations') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<AutomationsPage data={automationsData} icon={Icon} /></main></div>
+  if ((route as RouteName) === 'automations') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<AutomationsPage data={automationsData} icon={Icon} /></main></div>
   if (route === 'automations') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<AutomationsPage data={automationsData} icon={Icon} /></main></div>
   if (route === 'jarvis') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<JarvisPage data={jarvisData} icon={Icon} /></main></div>
   if (route === 'dociq') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<DocIQPage data={docIQData} icon={name => <Icon name={name} size={18} />} /></main></div>

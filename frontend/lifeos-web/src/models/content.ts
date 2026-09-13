@@ -11,6 +11,12 @@ export interface ContentGenerationResult {
   title: string
   body: string
   generatedAt: string
+  /** Legacy mock-result fields retained while the ContentService replaces earlier static data. */
+  script?: string[]
+  description?: string
+  tags?: string[]
+  pinnedComment?: string
+  thumbnailPrompt?: string
 }
 
 export interface ShortContentResult extends ContentGenerationResult {
