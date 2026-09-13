@@ -5,12 +5,12 @@ export interface ContentGenerationRequest {
 }
 
 export interface ContentGenerationResult {
-  id: string
-  format: ContentFormat
-  topic: string
+  id?: string
+  format?: ContentFormat
+  topic?: string
   title: string
-  body: string
-  generatedAt: string
+  body?: string
+  generatedAt?: string
   /** Legacy mock-result fields retained while the ContentService replaces earlier static data. */
   script?: string[]
   description?: string
