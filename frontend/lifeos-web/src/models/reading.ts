@@ -1,0 +1,1 @@
+export type ReadingStatus='queued'|'reading'|'completed'|'archived';export interface ReadingItem{id:string;title:string;url:string;source:string;tags:string[];priority:'high'|'medium'|'low';status:ReadingStatus;notes:string}export interface ReadingData{items:ReadingItem[]}

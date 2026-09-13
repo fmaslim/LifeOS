@@ -27,6 +27,7 @@ import { ProjectsPage } from './components/ProjectsPage'
 import { HabitsPage } from './components/HabitsPage'
 import { LearningPage } from './components/LearningPage'
 import { ContactsPage } from './components/ContactsPage'
+import { ReadingPage } from './components/ReadingPage'
 
 type IconName = DashboardIcon
 
@@ -53,6 +54,7 @@ const projectData = services.projects.getProjectData()
 const habitData = services.habits.getHabitData()
 const learningData = services.learning.getLearningData()
 const contactData = services.contacts.getContactData()
+const readingData = services.reading.getReadingData()
 const nav = shellData.navigation
 const cards = [dashboardData.automationSummary, dashboardData.youtubePipelineSummary, dashboardData.jarvisSummary, dashboardData.docIQSummary, dashboardData.rentalIncomeSummary, dashboardData.systemHealthSummary]
 const operations = dashboardData.dailyOperations
@@ -90,6 +92,7 @@ function App() {
   if (route === 'habits') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<HabitsPage data={habitData} /></main></div>
   if (route === 'learning') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<LearningPage data={learningData} /></main></div>
   if (route === 'contacts') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<ContactsPage data={contactData} /></main></div>
+  if (route === 'reading') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<ReadingPage data={readingData} /></main></div>
   if (route === 'notes') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<NotesPage data={noteData} /></main></div>
   if (route === 'tasks') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<TasksPage tasks={taskData.tasks} /></main></div>
   if (route === 'goals') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<GoalsPage data={goalData} /></main></div>

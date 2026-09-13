@@ -1,0 +1,1 @@
+import{readingMockData}from'../data/readingMockData';import type{ReadingData}from'../models/reading';import type{ReadingService}from'./ReadingService';export class MockReadingService implements ReadingService{getReadingData():ReadingData{return readingMockData}}
