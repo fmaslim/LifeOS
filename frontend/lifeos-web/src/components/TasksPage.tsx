@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import type { Task, TaskDomain, TaskPriority, TaskStatus } from '../models/task'
 import { StatePanel } from './StatePanel'
+import { storageKeys } from '../storage/storageKeys'
+import { usePersistentState } from '../storage/usePersistentState'
 import './TasksPage.css'
 
 type TaskPageState = 'ready' | 'loading' | 'error'
@@ -28,7 +30,7 @@ function TaskForm({ task, onSave, onCancel }: { task: Task | null; onSave: (draf
 }
 
 export function TasksPage({ tasks: initialTasks, state = 'ready' }: TasksPageProps) {
-  const [tasks, setTasks] = useState(initialTasks)
+  const [tasks, setTasks] = usePersistentState(storageKeys.tasks, initialTasks)
   const [status, setStatus] = useState<FilterValue<TaskStatus>>('all')
   const [priority, setPriority] = useState<FilterValue<TaskPriority>>('all')
   const [domain, setDomain] = useState<FilterValue<TaskDomain>>('all')

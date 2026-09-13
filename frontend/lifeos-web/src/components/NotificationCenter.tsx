@@ -1,10 +1,12 @@
 import { useMemo, useRef, useState } from 'react'
 import type { LifeNotification, NotificationData, NotificationSeverity, NotificationSource } from '../models/notification'
 import { StatePanel } from './StatePanel'
+import { storageKeys } from '../storage/storageKeys'
+import { usePersistentState } from '../storage/usePersistentState'
 import './NotificationCenter.css'
 
 export function NotificationCenter({ data }: { data: NotificationData }) {
-  const [items, setItems] = useState(data.notifications)
+  const [items, setItems] = usePersistentState(storageKeys.notifications, data.notifications)
   const [open, setOpen] = useState(false)
   const [source, setSource] = useState<NotificationSource | 'all'>('all')
   const [severity, setSeverity] = useState<NotificationSeverity | 'all'>('all')

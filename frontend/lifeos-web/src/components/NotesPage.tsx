@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import type { Note, NoteData, NoteDomain } from '../models/note'
 import { StatePanel } from './StatePanel'
+import { storageKeys } from '../storage/storageKeys'
+import { usePersistentState } from '../storage/usePersistentState'
 import './NotesPage.css'
 
 type View = 'inbox' | 'pinned' | 'all'
@@ -21,7 +23,7 @@ function NoteForm({ note, onSave, onCancel }: { note: Note | null; onSave: (draf
 }
 
 export function NotesPage({ data }: { data: NoteData }) {
-  const [notes, setNotes] = useState(data.notes)
+  const [notes, setNotes] = usePersistentState(storageKeys.notes, data.notes)
   const [view, setView] = useState<View>('inbox')
   const [query, setQuery] = useState('')
   const [domain, setDomain] = useState<NoteDomain | 'All'>('All')

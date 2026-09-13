@@ -10,57 +10,41 @@ import { FinancesPage } from './components/FinancesPage'
 import { HomePage } from './components/HomePage'
 import type { DashboardIcon } from './models/dashboard'
 import type { RouteName } from './models/shell'
-import { MockDashboardService } from './services/MockDashboardService'
-import { MockAutomationsService } from './services/MockAutomationsService'
-import { MockJarvisService } from './services/MockJarvisService'
-import { MockContentService } from './services/MockContentService'
-import { MockShellService } from './services/MockShellService'
-import { MockDocIQService } from './services/MockDocIQService'
-import { MockFinancesService } from './services/MockFinancesService'
-import { MockHomeService } from './services/MockHomeService'
-import { MockHealthService } from './services/MockHealthService'
 import { HealthPage } from './components/HealthPage'
 import { SettingsPage } from './components/SettingsPage'
-import { MockSettingsService } from './services/MockSettingsService'
-import { MockTodayService } from './services/MockTodayService'
 import { TodayPage } from './components/TodayPage'
 import { TasksPage } from './components/TasksPage'
-import { MockTaskService } from './services/MockTaskService'
 import { GoalsPage } from './components/GoalsPage'
-import { MockGoalService } from './services/MockGoalService'
 import { CalendarPage } from './components/CalendarPage'
-import { MockCalendarService } from './services/MockCalendarService'
 import { NotesPage } from './components/NotesPage'
-import { MockNoteService } from './services/MockNoteService'
 import { CommandPalette } from './components/CommandPalette'
-import { MockSearchService } from './services/MockSearchService'
 import { ActivityPage } from './components/ActivityPage'
-import { MockActivityService } from './services/MockActivityService'
 import { NotificationCenter } from './components/NotificationCenter'
-import { MockNotificationService } from './services/MockNotificationService'
+import { createServiceRegistry } from './services/serviceRegistry'
+import { storageKeys } from './storage/storageKeys'
+import { usePersistentState } from './storage/usePersistentState'
 
 type IconName = DashboardIcon
 
-const dashboardService = new MockDashboardService()
-const dashboardData = dashboardService.getDashboardData()
-const shellService = new MockShellService()
-const shellData = shellService.getShellData()
-const docIQData = new MockDocIQService().getDocIQData()
-const automationsData = new MockAutomationsService().getAutomationsData()
-const jarvisData = new MockJarvisService().getJarvisData()
-const contentService = new MockContentService()
-const financesData = new MockFinancesService().getFinancesData()
-const homeData = new MockHomeService().getHomeData()
-const healthData = new MockHealthService().getHealthData()
-const settingsData = new MockSettingsService().getSettingsData()
-const todayData = new MockTodayService().getTodayData()
-const taskData = new MockTaskService().getTaskData()
-const goalData = new MockGoalService().getGoalData()
-const calendarData = new MockCalendarService().getCalendarData()
-const noteData = new MockNoteService().getNoteData()
-const searchService = new MockSearchService()
-const activityData = new MockActivityService().getActivityData()
-const notificationData = new MockNotificationService().getNotificationData()
+const services = createServiceRegistry()
+const dashboardData = services.dashboard.getDashboardData()
+const shellData = services.shell.getShellData()
+const docIQData = services.docIQ.getDocIQData()
+const automationsData = services.automations.getAutomationsData()
+const jarvisData = services.jarvis.getJarvisData()
+const contentService = services.content
+const financesData = services.finances.getFinancesData()
+const homeData = services.home.getHomeData()
+const healthData = services.health.getHealthData()
+const settingsData = services.settings.getSettingsData()
+const todayData = services.today.getTodayData()
+const taskData = services.tasks.getTaskData()
+const goalData = services.goals.getGoalData()
+const calendarData = services.calendar.getCalendarData()
+const noteData = services.notes.getNoteData()
+const searchService = services.search
+const activityData = services.activity.getActivityData()
+const notificationData = services.notifications.getNotificationData()
 const nav = shellData.navigation
 const cards = [dashboardData.automationSummary, dashboardData.youtubePipelineSummary, dashboardData.jarvisSummary, dashboardData.docIQSummary, dashboardData.rentalIncomeSummary, dashboardData.systemHealthSummary]
 const operations = dashboardData.dailyOperations
@@ -80,7 +64,7 @@ function App() {
     return nav.some(item => item.route === route) ? route : 'dashboard'
   }
   const [route, setRoute] = useState<RouteName>(readRoute)
-  const [activeOperations, setActiveOperations] = useState(operations)
+  const [activeOperations, setActiveOperations] = usePersistentState(storageKeys.dashboardOperations, operations)
   useEffect(() => { const updateRoute = () => setRoute(readRoute()); window.addEventListener('hashchange', updateRoute); return () => window.removeEventListener('hashchange', updateRoute) }, [])
   const page = shellData.placeholderPages.find(item => item.route === route)
   const topbar = <header className="topbar"><div className="mobile-brand"><span className="brand-mark">L</span>LifeOS</div><CommandPalette navigation={nav} searchService={searchService} /><div className="header-actions"><NotificationCenter data={notificationData} /><button className="icon-button" aria-label="More options"><Icon name="more" /></button><span className="avatar">{shellData.profile.initials}</span></div></header>

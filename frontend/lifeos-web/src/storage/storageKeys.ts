@@ -1,0 +1,1 @@
+export const storageKeys = { tasks: 'tasks', goals: 'goals', notes: 'notes', calendar: 'calendar', notifications: 'notifications', todayTasks: 'today-tasks', todaySnoozed: 'today-snoozed', dashboardOperations: 'dashboard-operations' } as const

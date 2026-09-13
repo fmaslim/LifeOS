@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import type { Goal, GoalData, GoalStatus } from '../models/goal'
 import { StatePanel } from './StatePanel'
+import { storageKeys } from '../storage/storageKeys'
+import { usePersistentState } from '../storage/usePersistentState'
 import './GoalsPage.css'
 
 type GoalsPageState = 'ready' | 'loading' | 'error'
@@ -11,7 +13,7 @@ const progressOf = (goal: Goal) => Math.round((goal.milestones.filter(milestone 
 const dateLabel = (date: string) => new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(`${date}T00:00:00`))
 
 export function GoalsPage({ data, state = 'ready' }: { data: GoalData; state?: GoalsPageState }) {
-  const [goals, setGoals] = useState(data.goals)
+  const [goals, setGoals] = usePersistentState(storageKeys.goals, data.goals)
   const [filter, setFilter] = useState<GoalFilter>('all')
   const filteredGoals = useMemo(() => goals.filter(goal => filter === 'all' || goal.status === filter), [filter, goals])
   const activeGoals = goals.filter(goal => goal.status === 'active')
