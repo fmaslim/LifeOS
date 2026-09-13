@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "Cv+0RHMRhfU=",
+  "success": true,
+  "projectFilePath": "C:\\GitHub\\LifeOS\\backend\\LifeOS.Api\\LifeOS.Api.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\fmasl\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.11\\microsoft.aspnetcore.openapi.10.0.11.nupkg.sha512",
+    "C:\\Users\\fmasl\\.nuget\\packages\\microsoft.openapi\\2.7.5\\microsoft.openapi.2.7.5.nupkg.sha512"
+  ],
+  "logs": []
+}
