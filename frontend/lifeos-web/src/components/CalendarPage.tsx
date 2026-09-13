@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import type { CalendarCategory, CalendarData, CalendarEvent } from '../models/calendar'
 import { StatePanel } from './StatePanel'
+import { storageKeys } from '../storage/storageKeys'
+import { usePersistentState } from '../storage/usePersistentState'
 import './CalendarPage.css'
 
 type CalendarView = 'agenda' | 'week'
@@ -31,7 +33,7 @@ function EventForm({ event, initialDate, onSave, onCancel }: { event: CalendarEv
 
 export function CalendarPage({ data }: { data: CalendarData }) {
   const today = toIso(new Date())
-  const [events, setEvents] = useState(data.events)
+  const [events, setEvents] = usePersistentState(storageKeys.calendar, data.events)
   const [view, setView] = useState<CalendarView>('agenda')
   const [selectedDate, setSelectedDate] = useState(today)
   const [category, setCategory] = useState<CalendarCategory | 'all'>('all')

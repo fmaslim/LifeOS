@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import type { TodayData, TodayIcon } from '../models/today'
 import { StatePanel } from './StatePanel'
+import { storageKeys } from '../storage/storageKeys'
+import { usePersistentState } from '../storage/usePersistentState'
 import './TodayPage.css'
 
 type TodayPageState = 'ready' | 'loading' | 'error'
@@ -8,8 +10,8 @@ interface IconProps { name: TodayIcon; size?: number }
 interface TodayPageProps { data: TodayData; icon: (props: IconProps) => React.ReactNode; state?: TodayPageState }
 
 export function TodayPage({ data, icon: Icon, state = 'ready' }: TodayPageProps) {
-  const [tasks, setTasks] = useState(data.tasks)
-  const [snoozedTasks, setSnoozedTasks] = useState<string[]>([])
+  const [tasks, setTasks] = usePersistentState(storageKeys.todayTasks, data.tasks)
+  const [snoozedTasks, setSnoozedTasks] = usePersistentState<string[]>(storageKeys.todaySnoozed, [])
   const [openedSource, setOpenedSource] = useState<string | null>(null)
   const openSource = (source: string) => setOpenedSource(source)
   const visibleTasks = tasks.filter(task => !snoozedTasks.includes(task.id))
