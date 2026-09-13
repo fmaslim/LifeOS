@@ -1,0 +1,28 @@
+import type { FinancesData, FinanceIcon } from '../models/finances'
+import { StatePanel } from './StatePanel'
+import './FinancesPage.css'
+
+type PageState = 'ready' | 'loading' | 'error'
+interface IconProps { name: FinanceIcon; size?: number }
+interface FinancesPageProps { data: FinancesData; icon: (props: IconProps) => React.ReactNode; state?: PageState }
+
+const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
+
+export function FinancesPage({ data, icon: Icon, state = 'ready' }: FinancesPageProps) {
+  const maxCashFlow = Math.max(...data.cashFlow.flatMap(item => [item.income, item.expenses]))
+  const heading = <section className="finances-hero"><div><p className="eyebrow">Financial overview</p><h1>Finances</h1><p className="subtitle">A calm, complete view of your money, properties, and next decisions.</p></div><div className="finance-period"><span className="status-dot" />{data.periodLabel}</div></section>
+  if (state === 'loading') return <div className="dashboard finances-page">{heading}<StatePanel kind="loading" title="Loading finances" description="Preparing your latest financial snapshot." /></div>
+  if (state === 'error') return <div className="dashboard finances-page">{heading}<StatePanel kind="error" title="Unable to load finances" description="Try again when your workspace connection is available." /></div>
+  return <div className="dashboard finances-page">{heading}
+    <section className="finance-metric-grid">{data.metrics.map(metric => <article className="finance-metric" key={metric.label}><div className={`card-icon ${metric.tone}`}><Icon name={metric.icon} /></div><p>{metric.label}</p><strong>{metric.value}</strong><span>{metric.detail}</span>{metric.change && <small>{metric.change}</small>}</article>)}</section>
+    <section className="finance-layout finance-primary-layout">
+      <article className="panel finance-panel"><div className="panel-heading"><div><p className="eyebrow">Rental portfolio</p><h2>Property income</h2></div><button className="text-button">View properties <Icon name="arrow" size={16} /></button></div><div className="property-list">{data.properties.map(property => <article className="property-row" key={property.id}><div className="property-avatar">{property.property.charAt(0)}</div><div className="property-copy"><h3>{property.property}<span>{property.unit}</span></h3><p>{property.tenant} · {property.occupancy}</p></div><div className="property-rent"><strong>{property.rent}</strong><span className={`rent-status ${property.status === 'Paid' ? 'paid' : 'due'}`}>{property.due}</span></div></article>)}</div></article>
+      <article className="panel finance-panel"><div className="panel-heading"><div><p className="eyebrow">Upcoming</p><h2>Recurring bills</h2></div><button className="text-button">Manage <Icon name="arrow" size={16} /></button></div><div className="bill-list">{data.recurringBills.map(bill => <article className="bill-row" key={bill.id}><div className={`small-icon ${bill.tone}`}><Icon name={bill.icon} size={16} /></div><div><h3>{bill.name}</h3><p>{bill.category} · Due {bill.due}</p></div><strong>{bill.amount}</strong></article>)}</div></article>
+    </section>
+    <section className="finance-layout">
+      <article className="panel finance-panel cash-flow-panel"><div className="panel-heading"><div><p className="eyebrow">Income & outflow</p><h2>Monthly cash flow</h2></div><span className="cash-flow-total">+$4,708 net</span></div><div className="cash-flow-legend"><span><i className="income-key" />Income</span><span><i className="expense-key" />Expenses</span></div><div className="cash-flow-chart" aria-label="Monthly cash flow chart">{data.cashFlow.map(item => <div className="cash-flow-column" key={item.month}><div className="cash-flow-bars"><span className="income-bar" style={{ height: `${(item.income / maxCashFlow) * 100}%` }} title={`Income ${currency.format(item.income)}`} /><span className="expense-bar" style={{ height: `${(item.expenses / maxCashFlow) * 100}%` }} title={`Expenses ${currency.format(item.expenses)}`} /></div><small>{item.month}</small></div>)}</div><div className="cash-flow-footer"><span><b>Income</b> $47,050</span><span><b>Expenses</b> $19,402</span><span><b>Net</b> +$27,648</span></div></article>
+      <article className="panel finance-panel"><div className="panel-heading"><div><p className="eyebrow">Commitments</p><h2>Debt & financing</h2></div><button className="text-button">View all <Icon name="arrow" size={16} /></button></div><div className="debt-list">{data.debtPayments.map(debt => <article className="debt-row" key={debt.id}><div className="debt-row-top"><div><h3>{debt.name}</h3><p>{debt.balance} · Due {debt.due}</p></div><strong>{debt.payment}<span>/mo</span></strong></div><div className="debt-progress"><i className={debt.tone} style={{ width: `${debt.progress}%` }} /></div></article>)}</div></article>
+    </section>
+    <section className="panel finance-panel finance-activity"><div className="panel-heading"><div><p className="eyebrow">System log</p><h2>Recent activity</h2></div><button className="text-button">See all <Icon name="arrow" size={16} /></button></div><div className="finance-activity-list">{data.activity.length ? data.activity.map(activity => <article className="finance-activity-row" key={activity.id}><div className={`small-icon ${activity.tone}`}><Icon name={activity.icon} size={16} /></div><div><h3>{activity.title}</h3><p>{activity.description}</p></div><time>{activity.time}</time></article>) : <StatePanel kind="empty" title="No activity yet" description="Financial activity will appear here as it is recorded." />}</div></section>
+  </div>
+}
