@@ -7,6 +7,7 @@ import { calendarProviderService } from '../services/CalendarProviderService'
 import { cloudSyncService } from '../services/CloudSyncService'
 import { docIQProviderService } from '../services/DocIQProviderService'
 import { financeProviderService } from '../services/FinanceProviderService'
+import { homeProviderService } from '../services/HomeProviderService'
 import { localStore } from '../storage/LocalStore'
 import { storageKeys } from '../storage/storageKeys'
 import './AuthGate.css'
@@ -26,7 +27,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (state.status !== 'signed-in') { setWorkspaceReady(false); return }
     let active = true
-    Promise.all([cloudSyncService.sync(), calendarProviderService.refresh(), docIQProviderService.refresh(), financeProviderService.refresh()]).then(([, calendar]) => {
+    Promise.all([cloudSyncService.sync(), calendarProviderService.refresh(), docIQProviderService.refresh(), financeProviderService.refresh(), homeProviderService.refresh()]).then(([, calendar]) => {
       if (calendar.status === 'connected' || calendar.status === 'stale') {
         const existing = localStore.read<CalendarEvent[]>(storageKeys.calendar, [])
         const localOnly = existing.filter(event => !event.id.startsWith('provider-calendar-'))
