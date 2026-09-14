@@ -44,4 +44,18 @@ public sealed class LifeOSAuthenticationHandler : AuthenticationHandler<Authenti
         var ticket = new AuthenticationTicket(principal, Scheme);
         return Task.FromResult(AuthenticateResult.Success(ticket));
     }
+
+    protected override Task HandleChallengeAsync(AuthenticationProperties properties)
+    {
+        Response.StatusCode = StatusCodes.Status401Unauthorized;
+        Response.Headers["X-LifeOS-Auth-State"] = Request.Cookies.ContainsKey(CookieName) ? "expired" : "signed-out";
+        return Task.CompletedTask;
+    }
+
+    protected override Task HandleForbiddenAsync(AuthenticationProperties properties)
+    {
+        Response.StatusCode = StatusCodes.Status403Forbidden;
+        Response.Headers["X-LifeOS-Auth-State"] = "unauthorized";
+        return Task.CompletedTask;
+    }
 }
