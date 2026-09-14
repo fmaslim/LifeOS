@@ -33,6 +33,7 @@ import { BudgetPage } from './components/BudgetPage'
 import { PropertyPage } from './components/PropertyPage'
 import { ContentPipelinePage } from './components/ContentPipelinePage'
 import { AutomationBuilderPage } from './components/AutomationBuilderPage'
+import { KpiCard } from './components/visualizations/DataVisualizations'
 
 type IconName = DashboardIcon
 
@@ -77,7 +78,7 @@ function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{p[name]}</svg>
 }
 function Sidebar({ activeRoute }: { activeRoute: RouteName }) { return <aside className="sidebar"><div className="brand"><span className="brand-mark">L</span>LifeOS</div><nav><p className="nav-caption">Workspace</p>{nav.map(n => <a className={`nav-link ${n.route === activeRoute ? 'active' : ''}`} href={`#/${n.route}`} key={n.route}><Icon name={n.icon} />{n.label}</a>)}</nav><div className="sidebar-footer"><span className="avatar">{shellData.profile.initials}</span><div><strong>{shellData.profile.name}</strong><small>{shellData.profile.workspaceName}</small></div><Icon name="more" size={18} /></div></aside> }
-function SummaryCard({ card }: { card: typeof cards[number] }) { return <article className="summary-card"><div className={`card-icon ${card.tone}`}><Icon name={card.icon} /></div><p>{card.label}</p><strong>{card.value}</strong><span>{card.detail}</span></article> }
+function SummaryCard({ card }: { card: typeof cards[number] }) { return <KpiCard label={card.label} value={card.value} detail={card.detail} tone={card.tone} icon={<Icon name={card.icon} />} /> }
 function App() {
   const readRoute = (): RouteName => {
     const route = window.location.hash.replace('#/', '').split('?')[0] as RouteName
