@@ -36,6 +36,7 @@ const PlaceholderPage = lazy(() => import('./components/PlaceholderPage').then(m
 const ProjectsPage = lazy(() => import('./components/ProjectsPage').then(module => ({ default: module.ProjectsPage })))
 const PropertyPage = lazy(() => import('./components/PropertyPage').then(module => ({ default: module.PropertyPage })))
 const ReadingPage = lazy(() => import('./components/ReadingPage').then(module => ({ default: module.ReadingPage })))
+const SchedulesPage = lazy(() => import('./components/SchedulesPage').then(module => ({ default: module.SchedulesPage })))
 const SettingsPage = lazy(() => import('./components/SettingsPage').then(module => ({ default: module.SettingsPage })))
 const TasksPage = lazy(() => import('./components/TasksPage').then(module => ({ default: module.TasksPage })))
 const TodayPage = lazy(() => import('./components/TodayPage').then(module => ({ default: module.TodayPage })))
@@ -73,6 +74,7 @@ const contentPipelineData = services.contentPipeline.getContentPipelineData()
 const workflowDraftData = services.workflowDrafts.getWorkflowDraftData()
 const integrationProviders = services.integrationProviders.listProviders()
 const dailyBriefData = services.dailyBrief.getDailyBrief()
+const scheduleData = services.schedules.getScheduleData()
 const nav = shellData.navigation
 const commandRegistry = createCommandRegistry(nav)
 const cards = [dashboardData.automationSummary, dashboardData.youtubePipelineSummary, dashboardData.jarvisSummary, dashboardData.docIQSummary, dashboardData.rentalIncomeSummary, dashboardData.systemHealthSummary]
@@ -95,6 +97,7 @@ function AppRoutes() {
   const page = shellData.placeholderPages.find(item => item.route === route)
   const topbar = <header className="topbar"><div className="mobile-brand"><span className="brand-mark">L</span>LifeOS</div><CommandPalette registry={commandRegistry} searchService={searchService} /><div className="header-actions"><NotificationCenter data={notificationData} /><button className="icon-button" aria-label="More options"><Icon name="more" /></button><span className="avatar">{shellData.profile.initials}</span></div></header>
   if (route === 'daily-brief') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<DailyBriefPage data={dailyBriefData} /></main></div>
+  if (route === 'schedules') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<SchedulesPage data={scheduleData} /></main></div>
   if ((route as RouteName) === 'automations') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<AutomationsPage data={automationsData} icon={Icon} /></main></div>
   if (route === 'automations') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<AutomationsPage data={automationsData} icon={Icon} /></main></div>
   if (route === 'jarvis') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<JarvisPage data={jarvisData} icon={Icon} /></main></div>
