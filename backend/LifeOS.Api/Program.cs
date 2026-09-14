@@ -15,6 +15,7 @@ builder.Services.AddSingleton<ISecretProvider, EnvironmentSecretProvider>();
 builder.Services.AddSingleton<CredentialBroker>();
 builder.Services.AddHttpClient<GoogleCalendarProvider>();
 builder.Services.AddHttpClient<DocIQProvider>();
+builder.Services.AddHttpClient<FinanceProvider>();
 builder.Services.Configure<AuthOptions>(builder.Configuration.GetSection(AuthOptions.SectionName));
 builder.Services.AddSingleton<IAuthSessionService, HmacAuthSessionService>();
 builder.Services.AddSingleton<IApplicationRepository, JsonFileApplicationRepository>();
@@ -37,9 +38,7 @@ builder.Services.AddCors(options => options.AddPolicy("LifeOSWeb", policy =>
 }));
 
 var app = builder.Build();
-
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
-
 app.UseHttpsRedirection();
 app.UseCors("LifeOSWeb");
 app.UseAuthentication();
@@ -49,37 +48,27 @@ app.MapLifeOSAuth();
 app.MapLifeOSSync();
 app.MapLifeOSCalendar();
 app.MapLifeOSDocIQ();
+app.MapLifeOSFinance();
 
 app.MapGet("/health/persistence", async (HealthCheckService healthChecks, CancellationToken cancellationToken) =>
 {
     var report = await healthChecks.CheckHealthAsync(registration => registration.Name == "persistence", cancellationToken);
-    return report.Status == HealthStatus.Healthy
-        ? Results.Ok(new { status = "healthy" })
-        : Results.Json(new { status = "unavailable" }, statusCode: StatusCodes.Status503ServiceUnavailable);
+    return report.Status == HealthStatus.Healthy ? Results.Ok(new { status = "healthy" }) : Results.Json(new { status = "unavailable" }, statusCode: StatusCodes.Status503ServiceUnavailable);
 }).AllowAnonymous();
 
 app.MapGet("/api/integrations/credentials", async (CredentialBroker broker, CancellationToken cancellationToken) =>
 {
     var providers = new[]
     {
-        ("GitHub", "Integrations:GitHub:Credential"),
-        ("YouTube", "Integrations:YouTube:Credential"),
-        ("LinLoop Reach", "Integrations:Jarvis:Credential"),
-        ("Calendar", "Integrations:Calendar:Credential"),
-        ("DocIQ", "Integrations:DocIQ:Credential")
+        ("GitHub", "Integrations:GitHub:Credential"), ("YouTube", "Integrations:YouTube:Credential"), ("LinLoop Reach", "Integrations:Jarvis:Credential"),
+        ("Calendar", "Integrations:Calendar:Credential"), ("DocIQ", "Integrations:DocIQ:Credential"), ("Finance", "Integrations:Finance:Credential")
     };
     var statuses = await Task.WhenAll(providers.Select(item => broker.GetStatusAsync(item.Item1, item.Item2, cancellationToken).AsTask()));
     return Results.Ok(statuses);
 }).RequireAuthorization();
 
 var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
-app.MapGet("/weatherforecast", () => Enumerable.Range(1, 5).Select(index =>
-    new WeatherForecast(DateOnly.FromDateTime(DateTime.Now.AddDays(index)), Random.Shared.Next(-20, 55), summaries[Random.Shared.Next(summaries.Length)])).ToArray())
-    .WithName("GetWeatherForecast");
-
+app.MapGet("/weatherforecast", () => Enumerable.Range(1, 5).Select(index => new WeatherForecast(DateOnly.FromDateTime(DateTime.Now.AddDays(index)), Random.Shared.Next(-20, 55), summaries[Random.Shared.Next(summaries.Length)])).ToArray()).WithName("GetWeatherForecast");
 app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
+record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary) { public int TemperatureF => 32 + (int)(TemperatureC / 0.5556); }
