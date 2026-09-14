@@ -1,4 +1,5 @@
-import { FormEvent, ReactNode, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+import type { FormEvent, ReactNode } from 'react'
 import type { AuthState } from '../models/auth'
 import { authService } from '../services/AuthService'
 import './AuthGate.css'
