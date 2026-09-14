@@ -33,6 +33,9 @@ export interface JarvisActivity {
 }
 
 export interface JarvisData {
+  connection: 'connected' | 'stale' | 'unavailable'
+  providerName: string
+  fetchedAt: string
   status: 'Running' | 'Ready' | 'Paused'
   statusDetail: string
   lastRun: string
