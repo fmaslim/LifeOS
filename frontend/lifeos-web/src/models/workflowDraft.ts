@@ -1,0 +1,1 @@
+export interface WorkflowStep{id:string;action:string}export interface WorkflowDraft{id:string;name:string;trigger:string;conditions:string[];steps:WorkflowStep[];approvalRequired:boolean;enabled:boolean;schedule?:string}export interface WorkflowDraftData{drafts:WorkflowDraft[]}
