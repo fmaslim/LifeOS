@@ -18,7 +18,7 @@ export function ApprovalInboxPage({ service }: { service: ApprovalService }) {
       <dl><div><dt>Action</dt><dd>{item.action}</dd></div><div><dt>Created</dt><dd>{new Date(item.createdAt).toLocaleString()}</dd></div>{item.expiresAt && <div><dt>Expires</dt><dd>{new Date(item.expiresAt).toLocaleString()}</dd></div>}{item.correlationId && <div><dt>Correlation</dt><dd>{item.correlationId}</dd></div>}</dl>
       {item.payloadPreview && <details><summary>Payload preview</summary><pre>{JSON.stringify(item.payloadPreview, null, 2)}</pre></details>}
       {item.state === 'pending' && <footer><button className="approval-reject" onClick={() => { service.decide(item.id, 'rejected'); refresh() }}>Reject</button><button className="primary-button" onClick={() => { service.decide(item.id, 'approved'); refresh() }}>Approve</button></footer>}
-      {item.state === 'approved' && <footer><button className="primary-button" onClick={() => { service.markExecuted(item.id); refresh() }}>Mark executed</button></footer>}
+      {item.state === 'approved' && <footer><button className="primary-button" onClick={() => { void service.executeApproved(item.id).then(refresh) }}>Execute approved action</button></footer>}
     </article>) : <div className="panel approval-empty"><h2>No {filter} approvals</h2><p>Requests will appear here when a LifeOS workflow needs explicit permission.</p></div>}</section>
   </div>
 }
