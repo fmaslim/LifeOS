@@ -1,0 +1,14 @@
+{
+  "name": "LifeOS Personal Operating System",
+  "short_name": "LifeOS",
+  "description": "A private, local-first personal operating system.",
+  "start_url": "/#/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#111218",
+  "theme_color": "#16171f",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
