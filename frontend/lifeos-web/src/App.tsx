@@ -15,6 +15,7 @@ import { createCommandRegistry } from './services/CommandRegistry'
 
 const ActivityPage = lazy(() => import('./components/ActivityPage').then(module => ({ default: module.ActivityPage })))
 const AgentControlPage = lazy(() => import('./components/AgentControlPage').then(module => ({ default: module.AgentControlPage })))
+const AssistantPage = lazy(() => import('./components/AssistantPage').then(module => ({ default: module.AssistantPage })))
 const AutomationBuilderPage = lazy(() => import('./components/AutomationBuilderPage').then(module => ({ default: module.AutomationBuilderPage })))
 const AutomationHistoryPage = lazy(() => import('./components/AutomationHistoryPage').then(module => ({ default: module.AutomationHistoryPage })))
 const AutomationsPage = lazy(() => import('./components/AutomationsPage').then(module => ({ default: module.AutomationsPage })))
@@ -106,6 +107,7 @@ function AppRoutes() {
   if (route === 'automation-history') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<AutomationHistoryPage runs={automationRuns} /></main></div>
   if (route === 'github') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<GitHubProjectPage data={githubProjectData} /></main></div>
   if (route === 'agent-control') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<AgentControlPage service={services.agentControl} /></main></div>
+  if (route === 'assistant') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<AssistantPage service={services.assistant} /></main></div>
   if ((route as RouteName) === 'automations') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<AutomationsPage data={automationsData} icon={Icon} /></main></div>
   if (route === 'automations') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<AutomationsPage data={automationsData} icon={Icon} /></main></div>
   if (route === 'jarvis') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<JarvisPage data={jarvisData} icon={Icon} /></main></div>

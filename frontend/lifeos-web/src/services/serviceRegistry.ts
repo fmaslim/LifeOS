@@ -32,10 +32,12 @@ import { MockScheduleService } from './ScheduleService'
 import { MockAutomationHistoryService } from './AutomationHistoryService'
 import { MockGitHubProjectService } from './GitHubProjectService'
 import { MockAgentControlService } from './AgentControlService'
+import { LifeOSAssistantService } from './AssistantService'
 
 /** Single composition root for swappable LifeOS domain services. */
 export function createServiceRegistry() {
   const services = { activity: new MockActivityService(), agentControl: new MockAgentControlService(), automationHistory: new MockAutomationHistoryService(), automations: new MockAutomationsService(), budget: new MockBudgetService(), calendar: new MockCalendarService(), contacts: new MockContactService(), content: new MockContentService(), contentPipeline: new MockContentPipelineService(), dashboard: new MockDashboardService(), documents: new MockDocumentService(), docIQ: new MockDocIQService(), finances: new MockFinancesService(), github: new MockGitHubProjectService(), goals: new MockGoalService(), habits: new MockHabitService(), health: new MockHealthService(), home: new MockHomeService(), integrationProviders: new MockIntegrationProviderService(), jarvis: new MockJarvisService(), learning: new MockLearningService(), notes: new MockNoteService(), notifications: new MockNotificationService(), projects: new MockProjectService(), property: new MockPropertyService(), reading: new MockReadingService(), schedules: new MockScheduleService(), search: new MockSearchService(), settings: new MockSettingsService(), shell: new MockShellService(), tasks: new MockTaskService(), today: new MockTodayService(), workflowDrafts: new MockWorkflowDraftService() }
-  return { ...services, dailyBrief: new CompositeDailyBriefService(services) }
+  const dailyBrief = new CompositeDailyBriefService(services)
+  return { ...services, dailyBrief, assistant: new LifeOSAssistantService({ ...services, dailyBrief }) }
 }
 export type ServiceRegistry = ReturnType<typeof createServiceRegistry>
