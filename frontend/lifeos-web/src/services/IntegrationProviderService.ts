@@ -6,7 +6,7 @@ class MockProviderAdapter implements IntegrationProviderAdapter {
   readonly metadata: ProviderMetadata
   readonly capabilities: ProviderCapabilities
   constructor(metadata: ProviderMetadata, capabilities: ProviderCapabilities) { this.metadata = metadata; this.capabilities = capabilities }
-  getSnapshot(): ProviderSnapshot { return { metadata: this.metadata, capabilities: this.capabilities, connection: 'not-configured', health: 'unknown', message: 'Mock adapter ready for future configuration' } }
+  getSnapshot(): ProviderSnapshot { return { metadata: this.metadata, capabilities: this.capabilities, connection: 'not-configured', health: 'unknown', message: 'Mock adapter ready for future configuration', credential: { state: 'missing' } } }
 }
 
 const definitions: Array<[ProviderMetadata, ProviderCapabilities]> = [

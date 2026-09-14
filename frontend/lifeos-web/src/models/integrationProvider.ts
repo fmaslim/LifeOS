@@ -2,6 +2,7 @@ export type IntegrationProviderId = 'jarvis' | 'dociq' | 'youtube' | 'github' | 
 export type ProviderConnectionStatus = 'not-configured' | 'connected' | 'attention' | 'unavailable'
 export type ProviderHealth = 'unknown' | 'healthy' | 'degraded' | 'offline'
 export type ProviderCapability = 'read' | 'write' | 'events' | 'actions'
+export type CredentialState = 'missing' | 'invalid' | 'expired' | 'configured'
 
 export interface ProviderMetadata {
   id: IntegrationProviderId
@@ -18,6 +19,7 @@ export interface ProviderSnapshot {
   capabilities: ProviderCapabilities
   checkedAt?: string
   message: string
+  credential: { state: CredentialState; checkedAt?: string }
 }
 
 export interface IntegrationProviderAdapter {
