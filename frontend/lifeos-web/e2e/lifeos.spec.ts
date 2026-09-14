@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }) => {
 test('navigates across the major LifeOS workspaces', async ({ page }) => {
   const routes = [
     ['today', /Good (morning|afternoon|evening)/i], ['tasks', 'Tasks'], ['goals', 'Goals'], ['calendar', 'Calendar'],
-    ['notes', 'Notes'], ['content', 'Content'], ['automations', 'Automations'], ['settings', 'Settings'],
+    ['notes', 'Notes'], ['content', 'YouTube Content Generator'], ['automations', 'Automations'], ['settings', 'Settings'],
   ] as const
   for (const [route, heading] of routes) {
     await page.goto(`/#/${route}`)
@@ -31,7 +31,7 @@ test('persists note capture and goal milestone changes', async ({ page }) => {
   await page.goto('/#/notes')
   await page.getByRole('button', { name: '+ Quick capture' }).click()
   await page.getByLabel('Title').fill('E2E saved note')
-  await page.getByLabel('Note').fill('Local-first persistence smoke test')
+  await page.getByRole('textbox', { name: 'Note', exact: true }).fill('Local-first persistence smoke test')
   await page.getByRole('button', { name: 'Save note' }).click()
   await page.reload()
   await expect(page.getByText('E2E saved note')).toBeVisible()
@@ -47,7 +47,7 @@ test('persists note capture and goal milestone changes', async ({ page }) => {
 test('persists dashboard visibility preferences', async ({ page }) => {
   await page.goto('/#/dashboard')
   await page.getByRole('button', { name: 'Customize dashboard' }).click()
-  await page.getByLabel('Recent activity').uncheck()
+  await page.getByRole('checkbox', { name: /^Recent activity/ }).uncheck()
   await expect(page.getByRole('heading', { name: 'Recent Activity' })).toHaveCount(0)
   await page.reload()
   await expect(page.getByRole('heading', { name: 'Recent Activity' })).toHaveCount(0)
