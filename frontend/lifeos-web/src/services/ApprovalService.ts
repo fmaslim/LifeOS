@@ -20,7 +20,9 @@ export class ApprovalService {
   private requests: ApprovalRequest[]
   private readonly resumeHandlers = new Map<string, ResumeHandler>()
   private readonly executing = new Set<string>()
-  constructor(private readonly activity?: ActivityService, private readonly storage?: StorageLike) { this.requests = this.restore() }
+  private activity?: ActivityService
+  constructor(activity?: ActivityService, private readonly storage?: StorageLike) { this.activity = activity; this.requests = this.restore() }
+  attachActivity(activity: ActivityService) { this.activity = activity }
   private restore() { try { const parsed = JSON.parse(this.storage?.getItem(KEY) ?? '[]'); return Array.isArray(parsed) ? parsed as ApprovalRequest[] : [] } catch { return [] } }
   private save() { this.storage?.setItem(KEY, JSON.stringify(this.requests)) }
   private expire(now = new Date()) { const stamp = now.toISOString(); let changed = false; this.requests = this.requests.map(item => item.state === 'pending' && item.expiresAt && item.expiresAt <= stamp ? (changed = true, { ...item, state: 'expired' as const, decidedAt: stamp }) : item); if (changed) this.save() }
