@@ -17,6 +17,19 @@ builder.Services.AddAuthentication(LifeOSAuthenticationHandler.Scheme)
     .AddScheme<AuthenticationSchemeOptions, LifeOSAuthenticationHandler>(LifeOSAuthenticationHandler.Scheme, _ => { });
 builder.Services.AddAuthorization();
 
+var configuredOrigins = builder.Configuration.GetSection("Auth:AllowedOrigins").Get<string[]>() ?? [];
+builder.Services.AddCors(options => options.AddPolicy("LifeOSWeb", policy =>
+{
+    var origins = configuredOrigins.ToList();
+    if (builder.Environment.IsDevelopment())
+    {
+        origins.Add("http://localhost:5173");
+        origins.Add("http://localhost:4173");
+    }
+    if (origins.Count > 0)
+        policy.WithOrigins(origins.Distinct(StringComparer.OrdinalIgnoreCase).ToArray()).AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+}));
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -25,6 +38,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("LifeOSWeb");
 app.UseAuthentication();
 app.UseAuthorization();
 
