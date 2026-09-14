@@ -1,4 +1,4 @@
-export type IntegrationProviderId = 'jarvis' | 'dociq' | 'youtube' | 'calendar' | 'finance' | 'health' | 'smart-home'
+export type IntegrationProviderId = 'jarvis' | 'dociq' | 'youtube' | 'github' | 'calendar' | 'finance' | 'health' | 'smart-home'
 export type ProviderConnectionStatus = 'not-configured' | 'connected' | 'attention' | 'unavailable'
 export type ProviderHealth = 'unknown' | 'healthy' | 'degraded' | 'offline'
 export type ProviderCapability = 'read' | 'write' | 'events' | 'actions'

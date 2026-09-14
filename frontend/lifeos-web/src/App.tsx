@@ -27,6 +27,7 @@ const DocIQPage = lazy(() => import('./components/DocIQPage').then(module => ({ 
 const DocumentsPage = lazy(() => import('./components/DocumentsPage').then(module => ({ default: module.DocumentsPage })))
 const FinancesPage = lazy(() => import('./components/FinancesPage').then(module => ({ default: module.FinancesPage })))
 const GoalsPage = lazy(() => import('./components/GoalsPage').then(module => ({ default: module.GoalsPage })))
+const GitHubProjectPage = lazy(() => import('./components/GitHubProjectPage').then(module => ({ default: module.GitHubProjectPage })))
 const HabitsPage = lazy(() => import('./components/HabitsPage').then(module => ({ default: module.HabitsPage })))
 const HealthPage = lazy(() => import('./components/HealthPage').then(module => ({ default: module.HealthPage })))
 const HomePage = lazy(() => import('./components/HomePage').then(module => ({ default: module.HomePage })))
@@ -77,6 +78,7 @@ const integrationProviders = services.integrationProviders.listProviders()
 const dailyBriefData = services.dailyBrief.getDailyBrief()
 const scheduleData = services.schedules.getScheduleData()
 const automationRuns = services.automationHistory.list()
+const githubProjectData = services.github.getProjectData()
 const nav = shellData.navigation
 const commandRegistry = createCommandRegistry(nav)
 const cards = [dashboardData.automationSummary, dashboardData.youtubePipelineSummary, dashboardData.jarvisSummary, dashboardData.docIQSummary, dashboardData.rentalIncomeSummary, dashboardData.systemHealthSummary]
@@ -101,6 +103,7 @@ function AppRoutes() {
   if (route === 'daily-brief') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<DailyBriefPage data={dailyBriefData} /></main></div>
   if (route === 'schedules') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<SchedulesPage data={scheduleData} /></main></div>
   if (route === 'automation-history') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<AutomationHistoryPage runs={automationRuns} /></main></div>
+  if (route === 'github') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<GitHubProjectPage data={githubProjectData} /></main></div>
   if ((route as RouteName) === 'automations') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<AutomationsPage data={automationsData} icon={Icon} /></main></div>
   if (route === 'automations') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<AutomationsPage data={automationsData} icon={Icon} /></main></div>
   if (route === 'jarvis') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<JarvisPage data={jarvisData} icon={Icon} /></main></div>

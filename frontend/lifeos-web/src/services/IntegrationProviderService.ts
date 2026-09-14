@@ -13,6 +13,7 @@ const definitions: Array<[ProviderMetadata, ProviderCapabilities]> = [
   [{ id: 'jarvis', name: 'Jarvis', description: 'Assistant signals and focused workflows.', category: 'productivity' }, { read: true, write: false, events: true, actions: false }],
   [{ id: 'dociq', name: 'DocIQ', description: 'Document insights and review events.', category: 'productivity' }, { read: true, write: false, events: true, actions: false }],
   [{ id: 'youtube', name: 'YouTube', description: 'Content pipeline and channel metrics.', category: 'content' }, { read: true, write: false, events: true, actions: false }],
+  [{ id: 'github', name: 'GitHub', description: 'Repository delivery health and project activity.', category: 'productivity' }, { read: true, write: false, events: true, actions: false }],
   [{ id: 'calendar', name: 'Calendar', description: 'Unified schedule availability and events.', category: 'productivity' }, { read: true, write: true, events: true, actions: false }],
   [{ id: 'finance', name: 'Finance', description: 'Read-only account and property summaries.', category: 'finance' }, { read: true, write: false, events: true, actions: false }],
   [{ id: 'health', name: 'Health', description: 'Wellbeing signals and routine history.', category: 'wellbeing' }, { read: true, write: false, events: false, actions: false }],
