@@ -35,6 +35,7 @@ import { ContentPipelinePage } from './components/ContentPipelinePage'
 import { AutomationBuilderPage } from './components/AutomationBuilderPage'
 import { KpiCard } from './components/visualizations/DataVisualizations'
 import { DashboardWidgets } from './components/DashboardWidgets'
+import { resolveSafeRoute } from './routing/routeSafety'
 
 type IconName = DashboardIcon
 
@@ -81,10 +82,7 @@ function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
 function Sidebar({ activeRoute }: { activeRoute: RouteName }) { return <aside className="sidebar"><div className="brand"><span className="brand-mark">L</span>LifeOS</div><nav><p className="nav-caption">Workspace</p>{nav.map(n => <a className={`nav-link ${n.route === activeRoute ? 'active' : ''}`} href={`#/${n.route}`} key={n.route}><Icon name={n.icon} />{n.label}</a>)}</nav><div className="sidebar-footer"><span className="avatar">{shellData.profile.initials}</span><div><strong>{shellData.profile.name}</strong><small>{shellData.profile.workspaceName}</small></div><Icon name="more" size={18} /></div></aside> }
 function SummaryCard({ card }: { card: typeof cards[number] }) { return <KpiCard label={card.label} value={card.value} detail={card.detail} tone={card.tone} icon={<Icon name={card.icon} />} /> }
 function App() {
-  const readRoute = (): RouteName => {
-    const route = window.location.hash.replace('#/', '').split('?')[0] as RouteName
-    return nav.some(item => item.route === route) ? route : 'dashboard'
-  }
+  const readRoute = (): RouteName => resolveSafeRoute(window.location.hash, nav.map(item => item.route))
   const [route, setRoute] = useState<RouteName>(readRoute)
   const [activeOperations, setActiveOperations] = usePersistentState(storageKeys.dashboardOperations, operations)
   useEffect(() => { const updateRoute = () => setRoute(readRoute()); window.addEventListener('hashchange', updateRoute); return () => window.removeEventListener('hashchange', updateRoute) }, [])
