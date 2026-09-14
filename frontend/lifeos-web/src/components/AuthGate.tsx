@@ -1,12 +1,17 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent, ReactNode } from 'react'
 import type { AuthState } from '../models/auth'
+import type { CalendarEvent } from '../models/calendar'
 import { authService } from '../services/AuthService'
+import { calendarProviderService } from '../services/CalendarProviderService'
 import { cloudSyncService } from '../services/CloudSyncService'
+import { localStore } from '../storage/LocalStore'
+import { storageKeys } from '../storage/storageKeys'
 import './AuthGate.css'
 
 export function AuthGate({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>({ status: 'loading' })
+  const [workspaceReady, setWorkspaceReady] = useState(false)
   const [password, setPassword] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
@@ -17,8 +22,17 @@ export function AuthGate({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
-    if (state.status !== 'signed-in') return
-    void cloudSyncService.sync()
+    if (state.status !== 'signed-in') { setWorkspaceReady(false); return }
+    let active = true
+    Promise.all([cloudSyncService.sync(), calendarProviderService.refresh()]).then(([, calendar]) => {
+      if (calendar.status === 'connected' || calendar.status === 'stale') {
+        const existing = localStore.read<CalendarEvent[]>(storageKeys.calendar, [])
+        const localOnly = existing.filter(event => !event.id.startsWith('provider-calendar-'))
+        localStore.write(storageKeys.calendar, [...localOnly, ...calendar.events])
+      }
+      if (active) setWorkspaceReady(true)
+    }).catch(() => { if (active) setWorkspaceReady(true) })
+    return () => { active = false }
   }, [state.status])
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -31,8 +45,8 @@ export function AuthGate({ children }: { children: ReactNode }) {
     setSubmitting(false)
   }
 
-  if (state.status === 'loading') {
-    return <main className="auth-shell" aria-busy="true"><div className="auth-card"><span className="auth-mark">L</span><p className="auth-kicker">LifeOS</p><h1>Opening your workspace</h1><p className="auth-copy">Verifying your protected session…</p></div></main>
+  if (state.status === 'loading' || (state.status === 'signed-in' && !workspaceReady)) {
+    return <main className="auth-shell" aria-busy="true"><div className="auth-card"><span className="auth-mark">L</span><p className="auth-kicker">LifeOS</p><h1>Opening your workspace</h1><p className="auth-copy">Verifying your protected session and connected sources…</p></div></main>
   }
 
   if (state.status === 'signed-in') return <>{children}</>
