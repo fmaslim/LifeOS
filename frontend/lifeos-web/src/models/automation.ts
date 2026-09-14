@@ -10,5 +10,5 @@ export type ScheduleExecutionState = 'idle' | 'queued' | 'running' | 'failed'
 export interface AutomationSchedule { id: string; automationId: string; name: string; enabled: boolean; timezone: string; cadence: ScheduleCadence; previousRun?: string; nextRun: string; executionState: ScheduleExecutionState }
 export interface ScheduleData { schedules: AutomationSchedule[] }
 export type AutomationRunStatus = 'completed' | 'failed' | 'canceled' | 'retried'
-export interface AutomationRun { id: string; automationId: string; automationName: string; trigger: string; startedAt: string; endedAt: string; durationMs: number; status: AutomationRunStatus; outputSummary: string; errorDetails?: string; retryCount: number; relatedLinks: Array<{ label: string; href: string }> }
+export interface AutomationRun { id: string; automationId: string; automationName: string; trigger: string; startedAt: string; endedAt: string; durationMs: number; status: AutomationRunStatus; outputSummary: string; errorDetails?: string; retryCount: number; retryReason?: string; relatedLinks: Array<{ label: string; href: string }> }
 export interface AutomationRunFilter { automationId?: string; status?: AutomationRunStatus; from?: string; to?: string }
