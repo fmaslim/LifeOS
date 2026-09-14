@@ -21,7 +21,8 @@ export class ApprovalService {
   private readonly resumeHandlers = new Map<string, ResumeHandler>()
   private readonly executing = new Set<string>()
   private activity?: ActivityService
-  constructor(activity?: ActivityService, private readonly storage?: StorageLike) { this.activity = activity; this.requests = this.restore() }
+  private readonly storage?: StorageLike
+  constructor(activity?: ActivityService, storage?: StorageLike) { this.activity = activity; this.storage = storage; this.requests = this.restore() }
   attachActivity(activity: ActivityService) { this.activity = activity }
   private restore() { try { const parsed = JSON.parse(this.storage?.getItem(KEY) ?? '[]'); return Array.isArray(parsed) ? parsed as ApprovalRequest[] : [] } catch { return [] } }
   private save() { this.storage?.setItem(KEY, JSON.stringify(this.requests)) }
@@ -32,7 +33,8 @@ export class ApprovalService {
     const dedupe = input.correlationId ? this.requests.find(item => item.correlationId === input.correlationId && item.action === input.action && !['rejected','expired'].includes(item.state)) : undefined
     if (dedupe) { if (resume) this.resumeHandlers.set(dedupe.id, resume); return { ...dedupe } }
     const createdAt = new Date().toISOString()
-    const request: ApprovalRequest = { ...input, id: `approval-${crypto.randomUUID?.() ?? `${Date.now()}-${Math.random()}`}`, createdAt, state: 'pending', payloadPreview: sanitizeApprovalPreview(input.payloadPreview) }
+    const idPart = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`
+    const request: ApprovalRequest = { ...input, id: `approval-${idPart}`, createdAt, state: 'pending', payloadPreview: sanitizeApprovalPreview(input.payloadPreview) }
     this.requests.push(request); if (resume) this.resumeHandlers.set(request.id, resume); this.save(); this.audit(request, 'Approval requested')
     return { ...request }
   }
