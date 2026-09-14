@@ -23,7 +23,10 @@ const fallbackBrief = (now: Date): DailyBriefData => ({ generatedAt: now.toISOSt
 /** Coordinates one safe, observable morning run while keeping provider failures isolated. */
 export class MorningAutopilotService {
   private readonly completed = new Map<string, MorningAutopilotRun>()
-  constructor(private readonly services: MorningDependencies, private readonly timezone = 'America/New_York', private readonly scheduleId = 'schedule-morning-brief') {}
+  private readonly services: MorningDependencies
+  private readonly timezone: string
+  private readonly scheduleId: string
+  constructor(services: MorningDependencies, timezone = 'America/New_York', scheduleId = 'schedule-morning-brief') { this.services = services; this.timezone = timezone; this.scheduleId = scheduleId }
 
   runDue(now = new Date()) {
     if (!this.services.schedules.claimDue(this.scheduleId, now)) return undefined
