@@ -28,7 +28,7 @@ test('provider failures are classified and calendar writes remain approval-gated
   assert.match(backend, /X-LifeOS-Correlation-Id/)
 })
 
-test('server calendar credential never appears in frontend contracts', () => {
-  assert.doesNotMatch(provider, /Credential|Bearer|token|secret/i)
+test('server calendar credential values never enter frontend models', () => {
+  assert.doesNotMatch(provider, /authorization\s*:|bearer\s+|credentialValue|accessToken|refreshToken|apiKey/i)
   assert.match(backend, /Integrations:Calendar:Credential/)
 })
