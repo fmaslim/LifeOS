@@ -1,4 +1,5 @@
-import { activityMockData } from '../data/activityMockData'
-import type { ActivityData } from '../models/activity'
-import type { ActivityService } from './ActivityService'
-export class MockActivityService implements ActivityService { getActivityData(): ActivityData { return activityMockData } }
+import { activityMockData } from '../data/activityMockData.ts'
+import { PersistentActivityEventRepository, RepositoryActivityService } from './ActivityService.ts'
+export class MockActivityService extends RepositoryActivityService {
+  constructor() { const repository = new PersistentActivityEventRepository(activityMockData.events, typeof localStorage === 'undefined' ? undefined : localStorage); super(repository); repository.publish({ id: 'github-merge-102', timestamp: new Date().toISOString(), source: 'GitHub', type: 'Pull request merged', description: 'AI Assistant merged into main.', status: 'success', correlationId: 'issue-76', route: 'github', important: true }); repository.publish({ id: 'agent-start-77', timestamp: new Date().toISOString(), source: 'Agents', type: 'Agent task started', description: 'Persistent Activity timeline implementation began.', status: 'in-progress', correlationId: 'issue-77', route: 'agent-control', important: true }); repository.publish({ id: 'content-job-ready', timestamp: new Date(Date.now()-3_600_000).toISOString(), source: 'Integrations', type: 'Provider event', description: 'Content package moved to Ready.', status: 'info', runId: 'job-5', route: 'content-pipeline' }) }
+}
