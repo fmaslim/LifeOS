@@ -2,15 +2,21 @@ import type { JarvisData } from '../models/jarvis'
 
 // Frontend-only source of truth for the Jarvis placeholder dashboard.
 export const jarvisMockData: JarvisData = {
+  connection: 'connected',
+  providerName: 'LinLoop Reach',
+  fetchedAt: new Date().toISOString(),
   status: 'Running',
   statusDetail: 'Prospecting across your saved audiences',
   lastRun: 'Today, 9:42 AM',
   nextRun: 'Today, 2:00 PM',
   metrics: [
+    { label: 'Prospects found', value: '146', detail: '+24 this week', icon: 'users', tone: 'violet' },
     { label: 'Qualified prospects', value: '28', detail: '+6 discovered today', icon: 'users', tone: 'amber' },
     { label: 'Outreach queue', value: '12', detail: '8 scheduled today', icon: 'send', tone: 'violet' },
     { label: 'Replies', value: '7', detail: '18.4% reply rate', icon: 'mail', tone: 'green' },
     { label: 'Link clicks', value: '19', detail: '23.8% click rate', icon: 'chart', tone: 'blue' },
+    { label: 'Emails sent', value: '38', detail: '12 queued next', icon: 'send', tone: 'amber' },
+    { label: 'Signups', value: '5', detail: '13.2% conversion', icon: 'chart', tone: 'green' },
   ],
   qualifiedProspects: [
     { initials: 'AM', name: 'Avery Mitchell', company: 'Northstar Studio', role: 'Founder', score: 94, scoreLabel: 'Excellent fit' },

@@ -1,6 +1,8 @@
 import type { DashboardIcon } from '../models/dashboard'
 import type { JarvisData } from '../models/jarvis'
 import './JarvisPage.css'
+import './JarvisProvider.css'
+import { StatePanel } from './StatePanel'
 
 interface JarvisPageProps {
   data: JarvisData
@@ -20,12 +22,13 @@ export function JarvisPage({ data, icon: Icon }: JarvisPageProps) {
 
     <section className="jarvis-status" aria-label="Jarvis prospecting status">
       <div className="jarvis-status-mark"><Icon name="sparkles" size={21} /></div>
-      <div className="jarvis-status-copy"><span className="status-label"><i />{data.status}</span><strong>{data.statusDetail}</strong></div>
+      <div className="jarvis-status-copy"><span className={`status-label connection-${data.connection}`}><i />{data.providerName} · {data.connection}</span><strong>{data.statusDetail}</strong></div>
       <div className="run-time"><span>Last run</span><strong>{data.lastRun}</strong></div>
       <div className="run-time"><span>Next run</span><strong>{data.nextRun}</strong></div>
       <button className="text-button">View run history <Icon name="arrow" size={16} /></button>
     </section>
 
+    {data.connection === 'unavailable' && <StatePanel kind="error" title="Jarvis provider unavailable" description="Prospecting data could not be refreshed. Other LifeOS workspaces are unaffected." />}
     <section className="jarvis-metrics">{data.metrics.map(metric => <article className="jarvis-metric" key={metric.label}>
       <div className={`card-icon ${metric.tone}`}><Icon name={metric.icon} /></div><p>{metric.label}</p><strong>{metric.value}</strong><span>{metric.detail}</span>
     </article>)}</section>
