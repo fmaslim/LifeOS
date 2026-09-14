@@ -33,15 +33,17 @@ import { ProviderAwareDashboardService, ProviderBackedDocIQService } from './Pro
 import { publishDocIQSignals } from './DocIQSignalBridge'
 import { ProviderBackedFinancesService, publishFinanceSignals } from './ProviderBackedFinancesService'
 import { ProviderBackedHomeService, publishHomeSignals } from './ProviderBackedHomeService'
+import { approvalService } from './ApprovalService'
 
 /** Single composition root for swappable LifeOS domain services. */
 export function createServiceRegistry() {
-  const services = { activity: new MockActivityService(), agentControl: new MockAgentControlService(), automationHistory: new MockAutomationHistoryService(), automations: new MockAutomationsService(), budget: new MockBudgetService(), calendar: new MockCalendarService(), contacts: new MockContactService(), content: new MockContentService(), contentPipeline: new MockContentPipelineService(), dashboard: new ProviderAwareDashboardService(), documents: new MockDocumentService(), docIQ: new ProviderBackedDocIQService(), finances: new ProviderBackedFinancesService(), github: new MockGitHubProjectService(), goals: new MockGoalService(), habits: new MockHabitService(), health: new MockHealthService(), home: new ProviderBackedHomeService(), integrationProviders: new MockIntegrationProviderService(), jarvis: new MockJarvisService(), learning: new MockLearningService(), notes: new MockNoteService(), notifications: new MockNotificationService(), projects: new MockProjectService(), property: new MockPropertyService(), reading: new MockReadingService(), schedules: new MockScheduleService(), search: new MockSearchService(), settings: new MockSettingsService(), shell: new MockShellService(), tasks: new MockTaskService(), today: new MockTodayService(), workflowDrafts: new MockWorkflowDraftService() }
+  const services = { activity: new MockActivityService(), agentControl: new MockAgentControlService(), automationHistory: new MockAutomationHistoryService(), automations: new MockAutomationsService(), budget: new MockBudgetService(), calendar: new MockCalendarService(), contacts: new MockContactService(), content: new MockContentService(), contentPipeline: new MockContentPipelineService(), dashboard: new ProviderAwareDashboardService(), documents: new MockDocumentService(), docIQ: new ProviderBackedDocIQService(), finances: new ProviderBackedFinancesService(), github: new MockGitHubProjectService(), goals: new MockGoalService(), habits: new MockHabitService(), health: new MockHealthService(), home: new ProviderBackedHomeService(), integrationProviders: new MockIntegrationProviderService(), jarvis: new MockJarvisService(), learning: new MockLearningService(), notes: new MockNoteService(), notifications: new MockNotificationService(), projects: new MockProjectService(), property: new MockPropertyService(), reading: new MockReadingService(), schedules: new MockScheduleService(), search: new MockSearchService(), settings: new MockSettingsService(), shell: new MockShellService(), tasks: new MockTaskService(), today: new MockTodayService(), workflowDrafts: new MockWorkflowDraftService(), approvals: approvalService }
+  approvalService.attachActivity(services.activity)
   publishDocIQSignals(services.activity, services.notifications)
   publishFinanceSignals(services.activity, services.notifications)
   publishHomeSignals(services.activity, services.notifications)
   const dailyBrief = new CompositeDailyBriefService(services)
-  const assistant = new LifeOSAssistantService({ ...services, dailyBrief })
+  const assistant = new LifeOSAssistantService({ ...services, dailyBrief, approvals: approvalService })
   return { ...services, dailyBrief, assistant }
 }
 
