@@ -47,6 +47,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapLifeOSAuth();
+app.MapLifeOSSync();
 
 app.MapGet("/health/persistence", async (HealthCheckService healthChecks, CancellationToken cancellationToken) =>
 {
