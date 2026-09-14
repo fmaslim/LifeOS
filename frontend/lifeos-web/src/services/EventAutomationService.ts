@@ -4,6 +4,7 @@ import type { AutomationEvent, EventTriggerCondition, EventTriggerDefinition } f
 
 export interface EventAutomationResult { triggerId: string; automationId: string; status: 'completed' | 'failed'; runId: string }
 export type EventAutomationHandler = (event: AutomationEvent) => void | Promise<void>
+export interface EventProvider { fetchEvents(): Promise<AutomationEvent[]> }
 
 function readPath(value: Record<string, unknown>, path: string): unknown {
   return path.split('.').reduce<unknown>((current, key) => current && typeof current === 'object' ? (current as Record<string, unknown>)[key] : undefined, value)
@@ -36,6 +37,8 @@ export class EventAutomationService {
   register(definition: EventTriggerDefinition, handler: EventAutomationHandler) { this.triggers.set(definition.id, { definition, handler }) }
   unregister(triggerId: string) { this.triggers.delete(triggerId) }
   listTriggers() { return [...this.triggers.values()].map(item => ({ ...item.definition, conditions: item.definition.conditions?.map(condition => ({ ...condition })) })) }
+
+  async sync(provider: EventProvider) { return this.ingestMany(await provider.fetchEvents()) }
 
   async ingest(event: AutomationEvent): Promise<EventAutomationResult[]> {
     if (!validateAutomationEvent(event)) return []
