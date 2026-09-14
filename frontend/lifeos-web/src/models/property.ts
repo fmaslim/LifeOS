@@ -1,0 +1,1 @@
+export interface PropertyUnit{id:string;name:string;tenant:string;rent:number;payment:'paid'|'due'|'pending';leaseEnd:string;occupied:boolean}export interface MaintenanceItem{id:string;title:string;due:string;status:'planned'|'scheduled'|'done'}export interface PropertyData{name:string;units:PropertyUnit[];maintenance:MaintenanceItem[]}

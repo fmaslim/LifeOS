@@ -1,6 +1,6 @@
 import type { DashboardIcon } from './dashboard'
 
-export type RouteName = 'dashboard' | 'today' | 'activity' | 'calendar' | 'notes' | 'tasks' | 'goals' | 'projects' | 'habits' | 'learning' | 'contacts' | 'reading' | 'documents' | 'budget' | 'automations' | 'content' | 'jarvis' | 'dociq' | 'finances' | 'home' | 'health' | 'settings'
+export type RouteName = 'dashboard' | 'today' | 'activity' | 'calendar' | 'notes' | 'tasks' | 'goals' | 'projects' | 'habits' | 'learning' | 'contacts' | 'reading' | 'documents' | 'budget' | 'property' | 'automations' | 'content' | 'jarvis' | 'dociq' | 'finances' | 'home' | 'health' | 'settings'
 
 export interface ShellNavigationItem { label: string; route: RouteName; icon: DashboardIcon }
 export interface WorkspaceProfile { initials: string; name: string; workspaceName: string }
