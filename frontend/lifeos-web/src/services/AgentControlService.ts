@@ -1,4 +1,5 @@
 import type { AgentControlData, AgentControlRequest, AgentControlResult } from '../models/agentControl.ts'
+import { approvalService } from './ApprovalService.ts'
 export interface AgentMonitorProvider { readStatus(): AgentControlData }
 export interface AgentActionProvider { execute(request: AgentControlRequest): AgentControlResult }
 export interface AgentControlService { getStatus(): AgentControlData; control(request: AgentControlRequest): AgentControlResult }
@@ -6,7 +7,12 @@ export class ProviderBackedAgentControlService implements AgentControlService {
   private readonly monitor: AgentMonitorProvider; private readonly actions: AgentActionProvider
   constructor(monitor: AgentMonitorProvider, actions: AgentActionProvider) { this.monitor = monitor; this.actions = actions }
   getStatus() { try { return this.monitor.readStatus() } catch { return { provider: 'Agent provider', connection: 'unavailable' as const, agentStatus: 'idle' as const, lastActivity: 'Unavailable', tasks: [], message: 'Agent provider is unavailable. LifeOS remains operational.' } } }
-  control(request: AgentControlRequest) { try { return this.actions.execute(request) } catch { return { accepted: false, message: 'The control action could not reach the provider.' } } }
+  control(request: AgentControlRequest) {
+    try {
+      const approval = approvalService.request({ source: 'Agent Control', action: `agent.${request.action}`, summary: `${request.action} agent task ${request.taskId}`, risk: request.action === 'stop' ? 'high' : 'medium', correlationId: request.idempotencyKey, payloadPreview: { taskId: request.taskId, action: request.action } }, () => { this.actions.execute(request) })
+      return { accepted: false, message: `Waiting for approval (${approval.id}).` }
+    } catch { return { accepted: false, message: 'The control action could not be queued for approval.' } }
+  }
 }
 
 export class MockAgentProvider implements AgentMonitorProvider, AgentActionProvider {
