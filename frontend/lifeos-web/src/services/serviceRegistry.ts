@@ -39,6 +39,8 @@ import { WebhookEventProviderService } from './WebhookEventProviderService'
 import { MockKpiService } from './KpiService'
 import { WeeklyReviewService } from './WeeklyReviewService'
 
+let activeRegistry: unknown
+
 /** Single composition root for swappable LifeOS domain services. */
 export function createServiceRegistry() {
   const services = { activity: new MockActivityService(), agentControl: new MockAgentControlService(undefined, approvalService), automationHistory: new MockAutomationHistoryService(), automations: new MockAutomationsService(), budget: new MockBudgetService(), calendar: new MockCalendarService(), contacts: new MockContactService(), content: new MockContentService(), contentPipeline: new MockContentPipelineService(), dashboard: new ProviderAwareDashboardService(), documents: new MockDocumentService(), docIQ: new ProviderBackedDocIQService(), finances: new ProviderBackedFinancesService(), github: new MockGitHubProjectService(), goals: new MockGoalService(), habits: new MockHabitService(), health: new MockHealthService(), home: new ProviderBackedHomeService(), integrationProviders: new MockIntegrationProviderService(), jarvis: new MockJarvisService(), kpis: new MockKpiService(), learning: new MockLearningService(), notes: new MockNoteService(), notifications: new MockNotificationService(), projects: new MockProjectService(), property: new MockPropertyService(), reading: new MockReadingService(), schedules: new MockScheduleService(), search: new MockSearchService(), settings: new MockSettingsService(), shell: new MockShellService(), tasks: new MockTaskService(), today: new MockTodayService(), workflowDrafts: new MockWorkflowDraftService(), approvals: approvalService }
@@ -51,7 +53,15 @@ export function createServiceRegistry() {
   const weeklyReview = new WeeklyReviewService(services, approvalService)
   const dailyBrief = new CompositeDailyBriefService(services)
   const assistant = new LifeOSAssistantService({ ...services, dailyBrief, approvals: approvalService })
-  return { ...services, eventAutomations, webhookEvents, weeklyReview, dailyBrief, assistant }
+  const registry = { ...services, eventAutomations, webhookEvents, weeklyReview, dailyBrief, assistant }
+  activeRegistry = registry
+  return registry
+}
+
+/** Returns the composition root already created by the application shell. */
+export function getActiveServiceRegistry() {
+  if (!activeRegistry) throw new Error('LifeOS service registry has not been initialized.')
+  return activeRegistry as ReturnType<typeof createServiceRegistry>
 }
 
 /** Loaded only by the scheduler runtime so Morning Autopilot does not increase the initial app bundle. */
