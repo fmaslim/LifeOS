@@ -13,6 +13,7 @@ builder.Services.ConfigureHttpJsonOptions(options => options.SerializerOptions.C
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton<ISecretProvider, EnvironmentSecretProvider>();
 builder.Services.AddSingleton<CredentialBroker>();
+builder.Services.AddSingleton<WebhookEventInbox>();
 builder.Services.AddHttpClient<GoogleCalendarProvider>();
 builder.Services.AddHttpClient<DocIQProvider>();
 builder.Services.AddHttpClient<FinanceProvider>();
@@ -51,6 +52,7 @@ app.MapLifeOSCalendar();
 app.MapLifeOSDocIQ();
 app.MapLifeOSFinance();
 app.MapLifeOSHome();
+app.MapLifeOSEvents();
 
 app.MapGet("/health/persistence", async (HealthCheckService healthChecks, CancellationToken cancellationToken) =>
 {
@@ -64,7 +66,8 @@ app.MapGet("/api/integrations/credentials", async (CredentialBroker broker, Canc
     {
         ("GitHub", "Integrations:GitHub:Credential"), ("YouTube", "Integrations:YouTube:Credential"), ("LinLoop Reach", "Integrations:Jarvis:Credential"),
         ("Calendar", "Integrations:Calendar:Credential"), ("DocIQ", "Integrations:DocIQ:Credential"), ("Finance", "Integrations:Finance:Credential"),
-        ("Smart Home", "Integrations:Home:SmartHome:Credential"), ("Security", "Integrations:Home:Security:Credential"), ("Network", "Integrations:Home:Network:Credential"), ("Utilities", "Integrations:Home:Utilities:Credential")
+        ("Smart Home", "Integrations:Home:SmartHome:Credential"), ("Security", "Integrations:Home:Security:Credential"), ("Network", "Integrations:Home:Network:Credential"), ("Utilities", "Integrations:Home:Utilities:Credential"),
+        ("Webhook", "Integrations:Webhook:Credential")
     };
     var statuses = await Task.WhenAll(providers.Select(item => broker.GetStatusAsync(item.Item1, item.Item2, cancellationToken).AsTask()));
     return Results.Ok(statuses);
