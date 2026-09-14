@@ -34,6 +34,7 @@ const HabitsPage = lazy(() => import('./components/HabitsPage').then(module => (
 const HealthPage = lazy(() => import('./components/HealthPage').then(module => ({ default: module.HealthPage })))
 const HomePage = lazy(() => import('./components/HomePage').then(module => ({ default: module.HomePage })))
 const JarvisPage = lazy(() => import('./components/JarvisPage').then(module => ({ default: module.JarvisPage })))
+const KpisPage = lazy(() => import('./components/KpisPage').then(module => ({ default: module.KpisPage })))
 const LearningPage = lazy(() => import('./components/LearningPage').then(module => ({ default: module.LearningPage })))
 const NotesPage = lazy(() => import('./components/NotesPage').then(module => ({ default: module.NotesPage })))
 const PlaceholderPage = lazy(() => import('./components/PlaceholderPage').then(module => ({ default: module.PlaceholderPage })))
@@ -108,7 +109,7 @@ function AppRoutes() {
   if (route === 'github') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<GitHubProjectPage data={githubProjectData} /></main></div>
   if (route === 'agent-control') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<AgentControlPage service={services.agentControl} /></main></div>
   if (route === 'assistant') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<AssistantPage service={services.assistant} /></main></div>
-  if ((route as RouteName) === 'automations') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<AutomationsPage data={automationsData} icon={Icon} /></main></div>
+  if (route === 'kpis') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<KpisPage goals={goalData} /></main></div>
   if (route === 'automations') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<AutomationsPage data={automationsData} icon={Icon} /></main></div>
   if (route === 'jarvis') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<JarvisPage data={jarvisData} icon={Icon} /></main></div>
   if (route === 'dociq') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<DocIQPage data={docIQData} icon={name => <Icon name={name} size={18} />} /></main></div>

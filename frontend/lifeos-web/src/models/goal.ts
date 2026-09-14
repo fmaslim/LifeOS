@@ -19,3 +19,8 @@ export interface Goal {
 }
 
 export interface GoalData { goals: Goal[] }
+export type KpiFrequency = 'daily' | 'weekly' | 'monthly' | 'quarterly'
+export type KpiStatus = 'on-track' | 'at-risk' | 'achieved' | 'archived'
+export interface KpiSnapshot { at: string; value: number }
+export interface GoalKpi { id: string; goalId?: string; name: string; area: GoalArea; target: number; current: number; unit: string; frequency: KpiFrequency; status: KpiStatus; history: KpiSnapshot[] }
+export interface KpiData { kpis: GoalKpi[] }
