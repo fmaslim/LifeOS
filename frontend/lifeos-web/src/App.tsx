@@ -46,7 +46,7 @@ const SettingsPage = lazy(() => import('./components/SettingsPage').then(module 
 const TasksPage = lazy(() => import('./components/TasksPage').then(module => ({ default: module.TasksPage })))
 const TodayPage = lazy(() => import('./components/TodayPage').then(module => ({ default: module.TodayPage })))
 
-type IconName = DashboardIcon
+type IconName = DashboardIcon 
 
 const services = createServiceRegistry()
 const dashboardData = services.dashboard.getDashboardData()
