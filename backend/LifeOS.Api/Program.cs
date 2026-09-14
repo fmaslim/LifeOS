@@ -14,6 +14,7 @@ builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton<ISecretProvider, EnvironmentSecretProvider>();
 builder.Services.AddSingleton<CredentialBroker>();
 builder.Services.AddHttpClient<GoogleCalendarProvider>();
+builder.Services.AddHttpClient<DocIQProvider>();
 builder.Services.Configure<AuthOptions>(builder.Configuration.GetSection(AuthOptions.SectionName));
 builder.Services.AddSingleton<IAuthSessionService, HmacAuthSessionService>();
 builder.Services.AddSingleton<IApplicationRepository, JsonFileApplicationRepository>();
@@ -47,6 +48,7 @@ app.UseAuthorization();
 app.MapLifeOSAuth();
 app.MapLifeOSSync();
 app.MapLifeOSCalendar();
+app.MapLifeOSDocIQ();
 
 app.MapGet("/health/persistence", async (HealthCheckService healthChecks, CancellationToken cancellationToken) =>
 {
@@ -63,7 +65,8 @@ app.MapGet("/api/integrations/credentials", async (CredentialBroker broker, Canc
         ("GitHub", "Integrations:GitHub:Credential"),
         ("YouTube", "Integrations:YouTube:Credential"),
         ("LinLoop Reach", "Integrations:Jarvis:Credential"),
-        ("Calendar", "Integrations:Calendar:Credential")
+        ("Calendar", "Integrations:Calendar:Credential"),
+        ("DocIQ", "Integrations:DocIQ:Credential")
     };
     var statuses = await Task.WhenAll(providers.Select(item => broker.GetStatusAsync(item.Item1, item.Item2, cancellationToken).AsTask()));
     return Results.Ok(statuses);
