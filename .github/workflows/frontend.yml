@@ -1,0 +1,29 @@
+name: Frontend validation
+
+on:
+  pull_request:
+    paths: ['frontend/lifeos-web/**', '.github/workflows/frontend.yml']
+  push:
+    branches: [main]
+    paths: ['frontend/lifeos-web/**', '.github/workflows/frontend.yml']
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend/lifeos-web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/lifeos-web/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+      - run: npm run validate:bundle
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
