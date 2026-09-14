@@ -1,41 +1,42 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import './App.css'
-import { AutomationsPage } from './components/AutomationsPage'
-import { JarvisPage } from './components/JarvisPage'
-import { EmptyState } from './components/PageState'
-import { ContentPage } from './components/ContentPage'
-import { PlaceholderPage } from './components/PlaceholderPage'
-import { DocIQPage } from './components/DocIQPage'
-import { FinancesPage } from './components/FinancesPage'
-import { HomePage } from './components/HomePage'
+import { EmptyState, LoadingState } from './components/PageState'
 import type { DashboardIcon } from './models/dashboard'
 import type { RouteName } from './models/shell'
-import { HealthPage } from './components/HealthPage'
-import { SettingsPage } from './components/SettingsPage'
-import { TodayPage } from './components/TodayPage'
-import { TasksPage } from './components/TasksPage'
-import { GoalsPage } from './components/GoalsPage'
-import { CalendarPage } from './components/CalendarPage'
-import { NotesPage } from './components/NotesPage'
 import { CommandPalette } from './components/CommandPalette'
-import { ActivityPage } from './components/ActivityPage'
 import { NotificationCenter } from './components/NotificationCenter'
 import { createServiceRegistry } from './services/serviceRegistry'
 import { storageKeys } from './storage/storageKeys'
 import { usePersistentState } from './storage/usePersistentState'
-import { ProjectsPage } from './components/ProjectsPage'
-import { HabitsPage } from './components/HabitsPage'
-import { LearningPage } from './components/LearningPage'
-import { ContactsPage } from './components/ContactsPage'
-import { ReadingPage } from './components/ReadingPage'
-import { DocumentsPage } from './components/DocumentsPage'
-import { BudgetPage } from './components/BudgetPage'
-import { PropertyPage } from './components/PropertyPage'
-import { ContentPipelinePage } from './components/ContentPipelinePage'
-import { AutomationBuilderPage } from './components/AutomationBuilderPage'
 import { KpiCard } from './components/visualizations/DataVisualizations'
 import { DashboardWidgets } from './components/DashboardWidgets'
 import { resolveSafeRoute } from './routing/routeSafety'
+
+const ActivityPage = lazy(() => import('./components/ActivityPage').then(module => ({ default: module.ActivityPage })))
+const AutomationBuilderPage = lazy(() => import('./components/AutomationBuilderPage').then(module => ({ default: module.AutomationBuilderPage })))
+const AutomationsPage = lazy(() => import('./components/AutomationsPage').then(module => ({ default: module.AutomationsPage })))
+const BudgetPage = lazy(() => import('./components/BudgetPage').then(module => ({ default: module.BudgetPage })))
+const CalendarPage = lazy(() => import('./components/CalendarPage').then(module => ({ default: module.CalendarPage })))
+const ContactsPage = lazy(() => import('./components/ContactsPage').then(module => ({ default: module.ContactsPage })))
+const ContentPage = lazy(() => import('./components/ContentPage').then(module => ({ default: module.ContentPage })))
+const ContentPipelinePage = lazy(() => import('./components/ContentPipelinePage').then(module => ({ default: module.ContentPipelinePage })))
+const DocIQPage = lazy(() => import('./components/DocIQPage').then(module => ({ default: module.DocIQPage })))
+const DocumentsPage = lazy(() => import('./components/DocumentsPage').then(module => ({ default: module.DocumentsPage })))
+const FinancesPage = lazy(() => import('./components/FinancesPage').then(module => ({ default: module.FinancesPage })))
+const GoalsPage = lazy(() => import('./components/GoalsPage').then(module => ({ default: module.GoalsPage })))
+const HabitsPage = lazy(() => import('./components/HabitsPage').then(module => ({ default: module.HabitsPage })))
+const HealthPage = lazy(() => import('./components/HealthPage').then(module => ({ default: module.HealthPage })))
+const HomePage = lazy(() => import('./components/HomePage').then(module => ({ default: module.HomePage })))
+const JarvisPage = lazy(() => import('./components/JarvisPage').then(module => ({ default: module.JarvisPage })))
+const LearningPage = lazy(() => import('./components/LearningPage').then(module => ({ default: module.LearningPage })))
+const NotesPage = lazy(() => import('./components/NotesPage').then(module => ({ default: module.NotesPage })))
+const PlaceholderPage = lazy(() => import('./components/PlaceholderPage').then(module => ({ default: module.PlaceholderPage })))
+const ProjectsPage = lazy(() => import('./components/ProjectsPage').then(module => ({ default: module.ProjectsPage })))
+const PropertyPage = lazy(() => import('./components/PropertyPage').then(module => ({ default: module.PropertyPage })))
+const ReadingPage = lazy(() => import('./components/ReadingPage').then(module => ({ default: module.ReadingPage })))
+const SettingsPage = lazy(() => import('./components/SettingsPage').then(module => ({ default: module.SettingsPage })))
+const TasksPage = lazy(() => import('./components/TasksPage').then(module => ({ default: module.TasksPage })))
+const TodayPage = lazy(() => import('./components/TodayPage').then(module => ({ default: module.TodayPage })))
 
 type IconName = DashboardIcon
 
@@ -81,7 +82,7 @@ function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
 }
 function Sidebar({ activeRoute }: { activeRoute: RouteName }) { return <aside className="sidebar" aria-label="LifeOS workspace"><div className="brand"><span className="brand-mark">L</span>LifeOS</div><nav aria-label="Primary navigation"><p className="nav-caption">Workspace</p>{nav.map(n => <a className={`nav-link ${n.route === activeRoute ? 'active' : ''}`} aria-current={n.route === activeRoute ? 'page' : undefined} href={`#/${n.route}`} key={n.route}><Icon name={n.icon} />{n.label}</a>)}</nav><div className="sidebar-footer"><span className="avatar" aria-hidden="true">{shellData.profile.initials}</span><div><strong>{shellData.profile.name}</strong><small>{shellData.profile.workspaceName}</small></div><Icon name="more" size={18} /></div></aside> }
 function SummaryCard({ card }: { card: typeof cards[number] }) { return <KpiCard label={card.label} value={card.value} detail={card.detail} tone={card.tone} icon={<Icon name={card.icon} />} /> }
-function App() {
+function AppRoutes() {
   const readRoute = (): RouteName => resolveSafeRoute(window.location.hash, nav.map(item => item.route))
   const [route, setRoute] = useState<RouteName>(readRoute)
   const [activeOperations, setActiveOperations] = usePersistentState(storageKeys.dashboardOperations, operations)
@@ -116,4 +117,5 @@ function App() {
   if (route !== 'dashboard' && page) return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<PlaceholderPage page={page} icon={<Icon name={page.icon} size={27} />} /></main></div>
   return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<div className="dashboard"><section className="welcome"><div><p className="eyebrow">{dashboardData.currentDateLabel}</p><h1>LifeOS</h1><p className="subtitle">Your personal operating system</p></div><button className="primary-button">View all automations <Icon name="arrow" size={17} /></button></section><DashboardWidgets widgets={{ summary: <section className="summary-grid">{cards.map(c => <SummaryCard card={c} key={c.label} />)}</section>, operations: <section className="panel"><div className="panel-heading"><div><p className="eyebrow">Focus for today</p><h2>Today's Operations</h2></div><button className="text-button">View all <Icon name="arrow" size={16} /></button></div>{activeOperations.length ? <div className="operation-list">{activeOperations.map((o, i) => <article className="operation" key={o.title}><button className="check-button" aria-label={`Complete ${o.title}`} onClick={() => setActiveOperations(current => current.filter(item => item.title !== o.title))}><Icon name="check" size={14} /></button><div className={`small-icon ${o.tone}`}><Icon name={o.icon} size={18} /></div><div className="operation-copy"><h3>{o.title}</h3><p>{o.meta}</p></div><span className="operation-count">0{i + 1}</span></article>)}</div> : <EmptyState title="You're all caught up" description="Today's operations are complete. New priorities will appear here as they are scheduled." action={{ label: 'Restore today\'s list', onClick: () => setActiveOperations(operations) }} />}</section>, activity: <section className="panel"><div className="panel-heading"><div><p className="eyebrow">System log</p><h2>Recent Activity</h2></div><button className="text-button">See all <Icon name="arrow" size={16} /></button></div><div className="activity-list">{activity.map(a => <article className="activity" key={a.title}><div className={`small-icon ${a.tone}`}><Icon name={a.icon} size={17} /></div><div><h3>{a.title}</h3><p>{a.description}</p></div><time><Icon name="clock" size={13} />{a.time}</time></article>)}</div><button className="activity-footer">Open activity center <Icon name="arrow" size={16} /></button></section> }} /></div></main></div>
 }
+function App() { return <Suspense fallback={<main id="main-content" className="main-content"><div className="dashboard"><LoadingState title="Opening workspace" description="Loading only the tools this view needs." /></div></main>}><AppRoutes /></Suspense> }
 export default App
