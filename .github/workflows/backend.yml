@@ -15,5 +15,6 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-      - run: dotnet restore backend/LifeOS.Api/LifeOS.Api.csproj
-      - run: dotnet build backend/LifeOS.Api/LifeOS.Api.csproj --configuration Release --no-restore
+      - run: dotnet restore backend/LifeOS.Persistence.Tests/LifeOS.Persistence.Tests.csproj
+      - run: dotnet build backend/LifeOS.Persistence.Tests/LifeOS.Persistence.Tests.csproj --configuration Release --no-restore
+      - run: dotnet run --project backend/LifeOS.Persistence.Tests/LifeOS.Persistence.Tests.csproj --configuration Release --no-build
