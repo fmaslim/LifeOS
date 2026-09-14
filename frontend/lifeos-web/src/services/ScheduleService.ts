@@ -53,5 +53,6 @@ const now = new Date()
 const seed: AutomationSchedule[] = [
   { id: 'schedule-morning-brief', automationId: 'morning-brief', name: 'Morning Command Brief', enabled: true, timezone: 'America/New_York', cadence: { type: 'daily', time: '07:00' }, previousRun: new Date(now.getTime() - dayMs).toISOString(), nextRun: calculateNextRun({ type: 'daily', time: '07:00' }, 'America/New_York', now), executionState: 'idle' },
   { id: 'schedule-finance', automationId: 'weekly-finance', name: 'Weekly Finance Snapshot', enabled: true, timezone: 'America/New_York', cadence: { type: 'weekly', weekday: 5, time: '17:00' }, nextRun: calculateNextRun({ type: 'weekly', weekday: 5, time: '17:00' }, 'America/New_York', now), executionState: 'idle' },
+  { id: 'schedule-weekly-review', automationId: 'weekly-review', name: 'LifeOS Weekly Review', enabled: true, timezone: 'America/New_York', cadence: { type: 'weekly', weekday: 0, time: '18:00' }, nextRun: calculateNextRun({ type: 'weekly', weekday: 0, time: '18:00' }, 'America/New_York', now), executionState: 'idle' },
 ]
 export class MockScheduleService extends InMemoryScheduleService { constructor() { super(seed) } }
