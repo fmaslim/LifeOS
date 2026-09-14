@@ -30,15 +30,20 @@ public static class AuthEndpoints
         return endpoints;
     }
 
-    private static CookieOptions CookieOptions(HttpContext context) => new()
+    private static CookieOptions CookieOptions(HttpContext context)
     {
-        HttpOnly = true,
-        Secure = !context.Request.Host.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase),
-        SameSite = SameSiteMode.Strict,
-        Path = "/",
-        MaxAge = TimeSpan.FromDays(7),
-        IsEssential = true
-    };
+        var isLocal = context.Request.Host.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase) ||
+                      context.Request.Host.Host.Equals("127.0.0.1", StringComparison.OrdinalIgnoreCase);
+        return new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = !isLocal,
+            SameSite = isLocal ? SameSiteMode.Lax : SameSiteMode.None,
+            Path = "/",
+            MaxAge = TimeSpan.FromDays(7),
+            IsEssential = true
+        };
+    }
 
     public sealed record LoginRequest(string Password);
     public sealed record AuthState(bool IsAuthenticated, string? DisplayName, string? Reason);
