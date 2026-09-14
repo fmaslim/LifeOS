@@ -4,7 +4,7 @@ import { MockIntegrationProviderService } from '../src/services/IntegrationProvi
 
 test('exposes unique typed mock providers for every planned domain', () => {
   const providers = new MockIntegrationProviderService().listProviders()
-  assert.deepEqual(providers.map(provider => provider.metadata.id), ['jarvis', 'dociq', 'youtube', 'calendar', 'finance', 'health', 'smart-home'])
+  assert.deepEqual(providers.map(provider => provider.metadata.id), ['jarvis', 'dociq', 'youtube', 'github', 'calendar', 'finance', 'health', 'smart-home'])
   assert.equal(new Set(providers.map(provider => provider.metadata.id)).size, providers.length)
 })
 
