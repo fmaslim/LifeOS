@@ -32,6 +32,7 @@ import { DocumentsPage } from './components/DocumentsPage'
 import { BudgetPage } from './components/BudgetPage'
 import { PropertyPage } from './components/PropertyPage'
 import { ContentPipelinePage } from './components/ContentPipelinePage'
+import { AutomationBuilderPage } from './components/AutomationBuilderPage'
 
 type IconName = DashboardIcon
 
@@ -63,6 +64,7 @@ const documentData = services.documents.getDocumentData()
 const budgetData = services.budget.getBudgetData()
 const propertyData = services.property.getPropertyData()
 const contentPipelineData = services.contentPipeline.getContentPipelineData()
+const workflowDraftData = services.workflowDrafts.getWorkflowDraftData()
 const nav = shellData.navigation
 const cards = [dashboardData.automationSummary, dashboardData.youtubePipelineSummary, dashboardData.jarvisSummary, dashboardData.docIQSummary, dashboardData.rentalIncomeSummary, dashboardData.systemHealthSummary]
 const operations = dashboardData.dailyOperations
@@ -105,6 +107,7 @@ function App() {
   if (route === 'budget') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<BudgetPage data={budgetData} /></main></div>
   if (route === 'property') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<PropertyPage data={propertyData} /></main></div>
   if (route === 'content-pipeline') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<ContentPipelinePage data={contentPipelineData} /></main></div>
+  if (route === 'automation-builder') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<AutomationBuilderPage data={workflowDraftData} /></main></div>
   if (route === 'notes') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<NotesPage data={noteData} /></main></div>
   if (route === 'tasks') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<TasksPage tasks={taskData.tasks} /></main></div>
   if (route === 'goals') return <div className="app-shell"><Sidebar activeRoute={route} /><main className="main-content">{topbar}<GoalsPage data={goalData} /></main></div>
