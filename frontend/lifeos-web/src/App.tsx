@@ -15,6 +15,7 @@ import { createCommandRegistry } from './services/CommandRegistry'
 
 const ActivityPage = lazy(() => import('./components/ActivityPage').then(module => ({ default: module.ActivityPage })))
 const AutomationBuilderPage = lazy(() => import('./components/AutomationBuilderPage').then(module => ({ default: module.AutomationBuilderPage })))
+const AutomationHistoryPage = lazy(() => import('./components/AutomationHistoryPage').then(module => ({ default: module.AutomationHistoryPage })))
 const AutomationsPage = lazy(() => import('./components/AutomationsPage').then(module => ({ default: module.AutomationsPage })))
 const BudgetPage = lazy(() => import('./components/BudgetPage').then(module => ({ default: module.BudgetPage })))
 const CalendarPage = lazy(() => import('./components/CalendarPage').then(module => ({ default: module.CalendarPage })))
@@ -75,6 +76,7 @@ const workflowDraftData = services.workflowDrafts.getWorkflowDraftData()
 const integrationProviders = services.integrationProviders.listProviders()
 const dailyBriefData = services.dailyBrief.getDailyBrief()
 const scheduleData = services.schedules.getScheduleData()
+const automationRuns = services.automationHistory.list()
 const nav = shellData.navigation
 const commandRegistry = createCommandRegistry(nav)
 const cards = [dashboardData.automationSummary, dashboardData.youtubePipelineSummary, dashboardData.jarvisSummary, dashboardData.docIQSummary, dashboardData.rentalIncomeSummary, dashboardData.systemHealthSummary]
@@ -98,6 +100,7 @@ function AppRoutes() {
   const topbar = <header className="topbar"><div className="mobile-brand"><span className="brand-mark">L</span>LifeOS</div><CommandPalette registry={commandRegistry} searchService={searchService} /><div className="header-actions"><NotificationCenter data={notificationData} /><button className="icon-button" aria-label="More options"><Icon name="more" /></button><span className="avatar">{shellData.profile.initials}</span></div></header>
   if (route === 'daily-brief') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<DailyBriefPage data={dailyBriefData} /></main></div>
   if (route === 'schedules') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<SchedulesPage data={scheduleData} /></main></div>
+  if (route === 'automation-history') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<AutomationHistoryPage runs={automationRuns} /></main></div>
   if ((route as RouteName) === 'automations') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<AutomationsPage data={automationsData} icon={Icon} /></main></div>
   if (route === 'automations') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<AutomationsPage data={automationsData} icon={Icon} /></main></div>
   if (route === 'jarvis') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<JarvisPage data={jarvisData} icon={Icon} /></main></div>
