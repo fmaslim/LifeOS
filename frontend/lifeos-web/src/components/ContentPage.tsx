@@ -1,21 +1,20 @@
 import { useState } from 'react'
 import type { ContentGenerationResult } from '../models/content'
 import type { ContentService } from '../services/ContentService'
+import { ErrorState } from './PageState'
+import './ContentPage.css'
+import './ContentPageV2.css'
 
-interface ContentPageProps { contentService: ContentService }
+function Artifact({ label, value }: { label: string; value?: string | string[] }) {
+  const text = Array.isArray(value) ? value.join('\n\n') : value; const [copied, setCopied] = useState(false)
+  if (!text) return null
+  const copy = async () => { try { await navigator.clipboard.writeText(text); setCopied(true); window.setTimeout(() => setCopied(false), 1500) } catch { setCopied(false) } }
+  return <article className="result-card"><header><h3>{label}</h3><button className="copy-button" onClick={() => void copy()}>{copied ? 'Copied' : 'Copy'}</button></header><p className="result-copy">{text}</p></article>
+}
 
-/** Content UI depends only on the service contract, not on a concrete data source. */
-export function ContentPage({ contentService }: ContentPageProps) {
-  const [topic, setTopic] = useState('')
-  const [result, setResult] = useState<ContentGenerationResult | null>(null)
-  const [isGenerating, setIsGenerating] = useState(false)
-  const generate = async (format: 'short' | 'long') => {
-    setIsGenerating(true)
-    try {
-      const request = { topic }
-      setResult(format === 'short' ? await contentService.generateShortContent(request) : await contentService.generateLongContent(request))
-    } finally { setIsGenerating(false) }
-  }
-
-  return <div className="dashboard content-page"><p className="eyebrow">Creative engine</p><section className="content-hero"><div><h1>Content</h1><p className="subtitle">Turn an idea into a starting point for your next piece of content.</p></div><div className="content-form"><label htmlFor="content-topic">What do you want to create?</label><input id="content-topic" value={topic} onChange={event => setTopic(event.target.value)} placeholder="e.g. Building a morning routine" /><div className="content-actions"><button className="text-button" onClick={() => void generate('short')} disabled={isGenerating}>Generate Short</button><button className="primary-button" onClick={() => void generate('long')} disabled={isGenerating}>Generate Long</button></div></div></section>{result && <section className="content-result panel"><div className="panel-heading"><div><p className="eyebrow">Generated {result.format} content</p><h2>{result.title}</h2></div></div><p>{result.body}</p></section>}</div>
+export function ContentPage({ contentService }: { contentService: ContentService }) {
+  const [topic, setTopic] = useState(''); const [result, setResult] = useState<ContentGenerationResult | null>(null); const [state, setState] = useState<'idle' | 'generating' | 'error'>('idle'); const [error, setError] = useState(''); const providerStatus = contentService.getProviderStatus()
+  const generate = async (format: 'short' | 'long') => { setState('generating'); setError(''); try { const request = { topic }; setResult(format === 'short' ? await contentService.generateShortContent(request) : await contentService.generateLongContent(request)); setState('idle') } catch (cause) { setError(cause instanceof Error ? cause.message : 'Generator failed'); setState('error') } }
+  if (providerStatus !== 'configured') return <div className="dashboard content-page"><ErrorState title={providerStatus === 'missing' ? 'Generator provider not configured' : 'Generator unavailable'} description="Configure a content provider before starting a workflow. No external request was made." /></div>
+  return <div className="dashboard content-page"><section className="content-page-heading"><div><p className="eyebrow">Creative engine</p><h1>YouTube Content Generator</h1><p className="subtitle">Turn one idea into a complete cross-channel package.</p></div><span className="mock-badge">Provider ready</span></section><section className="generator-panel"><div className="topic-field"><label htmlFor="content-topic">Topic</label><input id="content-topic" value={topic} onChange={event => setTopic(event.target.value)} placeholder="Building a calmer morning routine" /></div><div className="content-actions"><button className="text-button" onClick={() => void generate('short')} disabled={state === 'generating' || !topic.trim()}>Generate Short</button><button className="primary-button" onClick={() => void generate('long')} disabled={state === 'generating' || !topic.trim()}>Generate Long</button></div></section>{state === 'generating' && <p className="generator-workflow" aria-live="polite">Generating content package…</p>}{state === 'error' && <ErrorState title="Generation failed" description={error} />}{result && <><div className="results-heading"><div><p className="eyebrow">{result.workflowState} · {result.format}</p><h2>{result.title}</h2></div><p>{result.generatedAt && new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(result.generatedAt))}</p></div><section className="content-results"><div className="result-stack"><Artifact label="Script" value={result.script ?? result.body} /><Artifact label="Description" value={result.description} /><Artifact label="Pinned comment" value={result.pinnedComment} /><Artifact label="Thumbnail prompt" value={result.thumbnailPrompt} /><Artifact label="Instagram caption" value={result.igCaption} /><Artifact label="Threads caption" value={result.threadsCaption} /><Artifact label="Medium article" value={result.mediumContent} /><Artifact label="Gumroad content" value={result.gumroadContent} /></div><Artifact label="Tags" value={result.tags} /></section></>}</div>
 }
