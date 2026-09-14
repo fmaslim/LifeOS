@@ -4,8 +4,9 @@ import type { DailyBriefData } from '../models/dailyBrief.ts'
 import type { JarvisData } from '../models/jarvis.ts'
 import type { ContentService } from './ContentService.ts'
 import type { ApprovalService } from './ApprovalService.ts'
+import { approvalService } from './ApprovalService.ts'
 
-interface AssistantDependencies { dailyBrief: { getDailyBrief(): DailyBriefData }; automationHistory: { list(): AutomationRun[] }; jarvis: { getJarvisData(): JarvisData }; content: ContentService; approvals: ApprovalService }
+interface AssistantDependencies { dailyBrief: { getDailyBrief(): DailyBriefData }; automationHistory: { list(): AutomationRun[] }; jarvis: { getJarvisData(): JarvisData }; content: ContentService; approvals?: ApprovalService }
 export interface AssistantService { ask(input: string, approved?: boolean): Promise<AssistantToolResult> }
 
 /** Local intent router over typed LifeOS tools. A language-model adapter can replace routing without changing tool approval rules. */
@@ -18,7 +19,7 @@ export class LifeOSAssistantService implements AssistantService {
       if (/generate.*content|content.*today/.test(normalized)) {
         if (!approved) {
           const correlationId = `assistant-content-${input.trim().toLowerCase().replace(/\W+/g, '-').slice(0, 48)}`
-          this.services.approvals.request({ source: 'AI Assistant', action: 'content.generate', summary: 'Generate a content package through the configured provider', risk: 'medium', correlationId, payloadPreview: { prompt: input } }, async () => { if (this.services.content.getProviderStatus() === 'configured') await this.services.content.generateShortContent({ topic: "today's highest-priority LifeOS theme" }) })
+          ;(this.services.approvals ?? approvalService).request({ source: 'AI Assistant', action: 'content.generate', summary: 'Generate a content package through the configured provider', risk: 'medium', correlationId, payloadPreview: { prompt: input } }, async () => { if (this.services.content.getProviderStatus() === 'configured') await this.services.content.generateShortContent({ topic: "today's highest-priority LifeOS theme" }) })
           return { kind: 'approval-required', tool: 'content.generate', risk: 'external-write', text: 'This content action is waiting in the Approval Inbox.' }
         }
         if (this.services.content.getProviderStatus() !== 'configured') return { kind: 'error', tool: 'content.generate', risk: 'external-write', text: 'The content provider is not configured.' }
