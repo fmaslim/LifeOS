@@ -3,8 +3,10 @@ import type { AutomationRun } from '../models/automation.ts'
 import type { DailyBriefData } from '../models/dailyBrief.ts'
 import type { JarvisData } from '../models/jarvis.ts'
 import type { ContentService } from './ContentService.ts'
+import type { ApprovalService } from './ApprovalService.ts'
+import { approvalService } from './ApprovalService.ts'
 
-interface AssistantDependencies { dailyBrief: { getDailyBrief(): DailyBriefData }; automationHistory: { list(): AutomationRun[] }; jarvis: { getJarvisData(): JarvisData }; content: ContentService }
+interface AssistantDependencies { dailyBrief: { getDailyBrief(): DailyBriefData }; automationHistory: { list(): AutomationRun[] }; jarvis: { getJarvisData(): JarvisData }; content: ContentService; approvals?: ApprovalService }
 export interface AssistantService { ask(input: string, approved?: boolean): Promise<AssistantToolResult> }
 
 /** Local intent router over typed LifeOS tools. A language-model adapter can replace routing without changing tool approval rules. */
@@ -15,7 +17,11 @@ export class LifeOSAssistantService implements AssistantService {
     const normalized = input.toLowerCase()
     try {
       if (/generate.*content|content.*today/.test(normalized)) {
-        if (!approved) return { kind: 'approval-required', tool: 'content.generate', risk: 'external-write', text: 'Generate a content package through the configured provider? This may create external provider work.' }
+        if (!approved) {
+          const correlationId = `assistant-content-${input.trim().toLowerCase().replace(/\W+/g, '-').slice(0, 48)}`
+          ;(this.services.approvals ?? approvalService).request({ source: 'AI Assistant', action: 'content.generate', summary: 'Generate a content package through the configured provider', risk: 'medium', correlationId, payloadPreview: { prompt: input } }, async () => { if (this.services.content.getProviderStatus() === 'configured') await this.services.content.generateShortContent({ topic: "today's highest-priority LifeOS theme" }) })
+          return { kind: 'approval-required', tool: 'content.generate', risk: 'external-write', text: 'This content action is waiting in the Approval Inbox.' }
+        }
         if (this.services.content.getProviderStatus() !== 'configured') return { kind: 'error', tool: 'content.generate', risk: 'external-write', text: 'The content provider is not configured.' }
         const result = await this.services.content.generateShortContent({ topic: "today's highest-priority LifeOS theme" }); return { kind: 'answer', tool: 'content.generate', risk: 'external-write', text: `Created “${result.title}” with ${result.tags?.length ?? 0} tags and a complete artifact package.`, links: [{ label: 'Open content', route: 'content' }, { label: 'Open pipeline', route: 'content-pipeline' }] }
       }
