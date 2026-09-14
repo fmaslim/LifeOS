@@ -1,6 +1,6 @@
 import type { AutomationSchedule, ScheduleCadence, ScheduleData } from '../models/automation.ts'
 
-export interface ScheduleService { getScheduleData(): ScheduleData; upsert(schedule: AutomationSchedule): void; setEnabled(id: string, enabled: boolean): void; claimDue(id: string, now: Date): boolean }
+export interface ScheduleService { getScheduleData(): ScheduleData; upsert(schedule: AutomationSchedule): void; setEnabled(id: string, enabled: boolean): void; claimDue(id: string, now: Date): boolean; markExecution(id: string, state: AutomationSchedule['executionState']): void }
 
 const dayMs = 86_400_000
 const parts = (date: Date, timezone: string) => Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: timezone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(date).filter(part => part.type !== 'literal').map(part => [part.type, Number(part.value)]))
@@ -35,6 +35,7 @@ export class InMemoryScheduleService implements ScheduleService {
   getScheduleData() { return { schedules: this.schedules.map(schedule => ({ ...schedule })) } }
   upsert(schedule: AutomationSchedule) { const index = this.schedules.findIndex(item => item.id === schedule.id); if (index < 0) this.schedules.push({ ...schedule }); else this.schedules[index] = { ...schedule } }
   setEnabled(id: string, enabled: boolean) { this.schedules = this.schedules.map(schedule => schedule.id === id ? { ...schedule, enabled } : schedule) }
+  markExecution(id: string, executionState: AutomationSchedule['executionState']) { this.schedules = this.schedules.map(schedule => schedule.id === id ? { ...schedule, executionState } : schedule) }
   claimDue(id: string, now: Date) {
     const schedule = this.schedules.find(item => item.id === id)
     if (!schedule || !schedule.enabled || Date.parse(schedule.nextRun) > now.getTime()) return false

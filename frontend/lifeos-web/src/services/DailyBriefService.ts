@@ -63,5 +63,11 @@ interface BriefDependencies {
 export class CompositeDailyBriefService {
   private readonly services: BriefDependencies
   constructor(services: BriefDependencies) { this.services = services }
-  getDailyBrief(now = new Date()) { return composeDailyBrief({ automations: this.services.automations.getAutomationsData(), calendar: this.services.calendar.getCalendarData(), dashboard: this.services.dashboard.getDashboardData(), goals: this.services.goals.getGoalData(), notifications: this.services.notifications.getNotificationData(), providers: this.services.integrationProviders.listProviders(), tasks: this.services.tasks.getTaskData() }, now) }
+  getDailyBrief(now = new Date()) {
+    let providers: ProviderSnapshot[]
+    try { providers = this.services.integrationProviders.listProviders() } catch {
+      providers = [{ metadata: { id: 'jarvis', name: 'Integration providers', description: 'Optional provider health could not be read.', category: 'productivity' }, connection: 'unavailable', health: 'offline', capabilities: { read: false, write: false, events: false, actions: false }, message: 'Provider status unavailable', credential: { state: 'missing' } }]
+    }
+    return composeDailyBrief({ automations: this.services.automations.getAutomationsData(), calendar: this.services.calendar.getCalendarData(), dashboard: this.services.dashboard.getDashboardData(), goals: this.services.goals.getGoalData(), notifications: this.services.notifications.getNotificationData(), providers, tasks: this.services.tasks.getTaskData() }, now)
+  }
 }
