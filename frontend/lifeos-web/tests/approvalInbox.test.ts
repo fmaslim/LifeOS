@@ -41,7 +41,7 @@ test('AI, agent, calendar, automation, and content actions use the shared approv
   const calendar = readFileSync(join(process.cwd(), 'src/services/CalendarProviderService.ts'), 'utf8')
   const gates = readFileSync(join(process.cwd(), 'src/services/ApprovalGates.ts'), 'utf8')
   const app = readFileSync(join(process.cwd(), 'src/App.tsx'), 'utf8')
-  assert.match(assistant, /approvals\.request/)
+  assert.match(assistant, /services\.approvals\s*\?\?\s*approvalService/)
   assert.match(agent, /approvalService\.request/)
   assert.match(calendar, /approvalService\.request/)
   assert.match(gates, /queueAutomationAction/)
