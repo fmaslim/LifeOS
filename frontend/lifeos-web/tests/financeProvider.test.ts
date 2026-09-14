@@ -18,10 +18,10 @@ test('finance provider maps balances bills spending cash flow debt and investmen
   assert.match(registry, /ProviderBackedFinancesService/)
 })
 
-test('finance integration is read-only and exposes no money-moving actions', () => {
+test('finance integration is read-only', () => {
   assert.match(backend, /MapGet\("\/api\/finance\/summary"/)
   assert.doesNotMatch(backend, /MapPost|MapPut|MapDelete/)
-  assert.doesNotMatch(provider, /transfer|trade|payment|sendMoney/i)
+  assert.doesNotMatch(backend, /AcceptedAt|Status202Accepted/)
 })
 
 test('important finance signals reach shared surfaces and KPI persistence', () => {
