@@ -19,6 +19,7 @@ const AutomationsPage = lazy(() => import('./components/AutomationsPage').then(m
 const BudgetPage = lazy(() => import('./components/BudgetPage').then(module => ({ default: module.BudgetPage })))
 const CalendarPage = lazy(() => import('./components/CalendarPage').then(module => ({ default: module.CalendarPage })))
 const ContactsPage = lazy(() => import('./components/ContactsPage').then(module => ({ default: module.ContactsPage })))
+const DailyBriefPage = lazy(() => import('./components/DailyBriefPage').then(module => ({ default: module.DailyBriefPage })))
 const ContentPage = lazy(() => import('./components/ContentPage').then(module => ({ default: module.ContentPage })))
 const ContentPipelinePage = lazy(() => import('./components/ContentPipelinePage').then(module => ({ default: module.ContentPipelinePage })))
 const DocIQPage = lazy(() => import('./components/DocIQPage').then(module => ({ default: module.DocIQPage })))
@@ -71,6 +72,7 @@ const propertyData = services.property.getPropertyData()
 const contentPipelineData = services.contentPipeline.getContentPipelineData()
 const workflowDraftData = services.workflowDrafts.getWorkflowDraftData()
 const integrationProviders = services.integrationProviders.listProviders()
+const dailyBriefData = services.dailyBrief.getDailyBrief()
 const nav = shellData.navigation
 const commandRegistry = createCommandRegistry(nav)
 const cards = [dashboardData.automationSummary, dashboardData.youtubePipelineSummary, dashboardData.jarvisSummary, dashboardData.docIQSummary, dashboardData.rentalIncomeSummary, dashboardData.systemHealthSummary]
@@ -92,6 +94,7 @@ function AppRoutes() {
   useEffect(() => { const updateRoute = () => setRoute(readRoute()); window.addEventListener('hashchange', updateRoute); return () => window.removeEventListener('hashchange', updateRoute) }, [])
   const page = shellData.placeholderPages.find(item => item.route === route)
   const topbar = <header className="topbar"><div className="mobile-brand"><span className="brand-mark">L</span>LifeOS</div><CommandPalette registry={commandRegistry} searchService={searchService} /><div className="header-actions"><NotificationCenter data={notificationData} /><button className="icon-button" aria-label="More options"><Icon name="more" /></button><span className="avatar">{shellData.profile.initials}</span></div></header>
+  if (route === 'daily-brief') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<DailyBriefPage data={dailyBriefData} /></main></div>
   if ((route as RouteName) === 'automations') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<AutomationsPage data={automationsData} icon={Icon} /></main></div>
   if (route === 'automations') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<AutomationsPage data={automationsData} icon={Icon} /></main></div>
   if (route === 'jarvis') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<JarvisPage data={jarvisData} icon={Icon} /></main></div>
