@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { FormEvent, ReactNode } from 'react'
 import type { AuthState } from '../models/auth'
 import { authService } from '../services/AuthService'
+import { cloudSyncService } from '../services/CloudSyncService'
 import './AuthGate.css'
 
 export function AuthGate({ children }: { children: ReactNode }) {
@@ -14,6 +15,11 @@ export function AuthGate({ children }: { children: ReactNode }) {
     authService.getSession().then(next => { if (active) setState(next) })
     return () => { active = false }
   }, [])
+
+  useEffect(() => {
+    if (state.status !== 'signed-in') return
+    void cloudSyncService.sync()
+  }, [state.status])
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
