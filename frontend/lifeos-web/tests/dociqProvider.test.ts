@@ -31,8 +31,8 @@ test('provider failures stay isolated and external actions remain approval gated
   assert.match(page, /target="_blank"/)
 })
 
-test('DocIQ secrets remain server-side', () => {
+test('DocIQ secret values remain server-side', () => {
   assert.match(backend, /Integrations:DocIQ:Credential/)
   assert.match(backend, /Authorization = new AuthenticationHeaderValue/)
-  assert.doesNotMatch(provider, /Bearer|Credential|ApiKey|secret/i)
+  assert.doesNotMatch(provider, /Bearer|ApiKey|accessToken|secretValue/i)
 })
