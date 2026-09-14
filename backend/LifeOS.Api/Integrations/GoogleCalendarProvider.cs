@@ -8,7 +8,7 @@ namespace LifeOS.Api.Integrations;
 public sealed record CalendarProviderEvent(string Id, string Title, DateTimeOffset? Start, DateTimeOffset? End, string? StartDate, string? EndDate, string? Description, string? HtmlLink);
 public sealed record CalendarProviderSnapshot(string Status, DateTimeOffset CheckedAt, IReadOnlyList<CalendarProviderEvent> Events, string? Message);
 
-public sealed class GoogleCalendarProvider(HttpClient httpClient, CredentialBroker credentials, TimeProvider timeProvider)
+internal sealed class GoogleCalendarProvider(HttpClient httpClient, CredentialBroker credentials, TimeProvider timeProvider)
 {
     private const string CredentialKey = "Integrations:Calendar:Credential";
 
