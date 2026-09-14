@@ -1,6 +1,8 @@
 using LifeOS.Api.Auth;
 using LifeOS.Api.Integrations;
+using LifeOS.Api.Persistence;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -13,6 +15,8 @@ builder.Services.AddSingleton<ISecretProvider, EnvironmentSecretProvider>();
 builder.Services.AddSingleton<CredentialBroker>();
 builder.Services.Configure<AuthOptions>(builder.Configuration.GetSection(AuthOptions.SectionName));
 builder.Services.AddSingleton<IAuthSessionService, HmacAuthSessionService>();
+builder.Services.AddSingleton<IApplicationRepository, JsonFileApplicationRepository>();
+builder.Services.AddHealthChecks().AddCheck<PersistenceHealthCheck>("persistence");
 builder.Services.AddAuthentication(LifeOSAuthenticationHandler.Scheme)
     .AddScheme<AuthenticationSchemeOptions, LifeOSAuthenticationHandler>(LifeOSAuthenticationHandler.Scheme, _ => { });
 builder.Services.AddAuthorization();
@@ -43,6 +47,14 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapLifeOSAuth();
+
+app.MapGet("/health/persistence", async (HealthCheckService healthChecks, CancellationToken cancellationToken) =>
+{
+    var report = await healthChecks.CheckHealthAsync(registration => registration.Name == "persistence", cancellationToken);
+    return report.Status == HealthStatus.Healthy
+        ? Results.Ok(new { status = "healthy" })
+        : Results.Json(new { status = "unavailable" }, statusCode: StatusCodes.Status503ServiceUnavailable);
+}).AllowAnonymous();
 
 app.MapGet("/api/integrations/credentials", async (CredentialBroker broker, CancellationToken cancellationToken) =>
 {
