@@ -34,6 +34,8 @@ import { publishDocIQSignals } from './DocIQSignalBridge'
 import { ProviderBackedFinancesService, publishFinanceSignals } from './ProviderBackedFinancesService'
 import { ProviderBackedHomeService, publishHomeSignals } from './ProviderBackedHomeService'
 import { approvalService } from './ApprovalService'
+import { EventAutomationService } from './EventAutomationService'
+import { WebhookEventProviderService } from './WebhookEventProviderService'
 
 /** Single composition root for swappable LifeOS domain services. */
 export function createServiceRegistry() {
@@ -42,9 +44,11 @@ export function createServiceRegistry() {
   publishDocIQSignals(services.activity, services.notifications)
   publishFinanceSignals(services.activity, services.notifications)
   publishHomeSignals(services.activity, services.notifications)
+  const eventAutomations = new EventAutomationService(services.automationHistory, services.activity)
+  const webhookEvents = new WebhookEventProviderService()
   const dailyBrief = new CompositeDailyBriefService(services)
   const assistant = new LifeOSAssistantService({ ...services, dailyBrief, approvals: approvalService })
-  return { ...services, dailyBrief, assistant }
+  return { ...services, eventAutomations, webhookEvents, dailyBrief, assistant }
 }
 
 /** Loaded only by the scheduler runtime so Morning Autopilot does not increase the initial app bundle. */
