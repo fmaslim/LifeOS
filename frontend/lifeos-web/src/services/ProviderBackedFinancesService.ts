@@ -26,7 +26,7 @@ export function publishFinanceSignals(activity: ActivityService, notifications: 
   const net = netMetric.income - netMetric.expenses
   const existing = localStore.read<GoalKpi[]>(storageKeys.kpis, [])
   const now = new Date().toISOString().slice(0, 10)
-  const kpi: GoalKpi = { id: 'finance-monthly-cash-flow', name: 'Monthly net cash flow', area: 'Finances', target: Math.max(net, 1), current: net, unit: 'USD', frequency: 'monthly', status: net >= 0 ? 'on-track' : 'at-risk', history: [{ at: now, value: net }] }
+  const kpi: GoalKpi = { id: 'finance-monthly-cash-flow', name: 'Monthly net cash flow', area: 'Finance', target: Math.max(net, 1), current: net, unit: 'USD', frequency: 'monthly', status: net >= 0 ? 'on-track' : 'at-risk', history: [{ at: now, value: net }] }
   const current = existing.find(item => item.id === kpi.id)
   if (!current) localStore.write(storageKeys.kpis, [...existing, kpi])
   else if (!current.history.some(item => item.at === now && item.value === net)) localStore.write(storageKeys.kpis, existing.map(item => item.id === kpi.id ? { ...item, current: net, status: kpi.status, history: [...item.history, { at: now, value: net }] } : item))
