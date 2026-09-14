@@ -17,6 +17,12 @@ export interface ContentGenerationResult {
   tags?: string[]
   pinnedComment?: string
   thumbnailPrompt?: string
+  igCaption?: string
+  threadsCaption?: string
+  mediumContent?: string
+  gumroadContent?: string
+  workflowState?: 'queued' | 'generating' | 'completed' | 'failed'
+  error?: string
 }
 
 export interface ShortContentResult extends ContentGenerationResult {
