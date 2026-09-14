@@ -11,6 +11,7 @@ import { usePersistentState } from './storage/usePersistentState'
 import { KpiCard } from './components/visualizations/DataVisualizations'
 import { DashboardWidgets } from './components/DashboardWidgets'
 import { resolveSafeRoute } from './routing/routeSafety'
+import { createCommandRegistry } from './services/CommandRegistry'
 
 const ActivityPage = lazy(() => import('./components/ActivityPage').then(module => ({ default: module.ActivityPage })))
 const AutomationBuilderPage = lazy(() => import('./components/AutomationBuilderPage').then(module => ({ default: module.AutomationBuilderPage })))
@@ -71,6 +72,7 @@ const contentPipelineData = services.contentPipeline.getContentPipelineData()
 const workflowDraftData = services.workflowDrafts.getWorkflowDraftData()
 const integrationProviders = services.integrationProviders.listProviders()
 const nav = shellData.navigation
+const commandRegistry = createCommandRegistry(nav)
 const cards = [dashboardData.automationSummary, dashboardData.youtubePipelineSummary, dashboardData.jarvisSummary, dashboardData.docIQSummary, dashboardData.rentalIncomeSummary, dashboardData.systemHealthSummary]
 const operations = dashboardData.dailyOperations
 const activity = dashboardData.recentActivity
@@ -89,7 +91,7 @@ function AppRoutes() {
   const [activeOperations, setActiveOperations] = usePersistentState(storageKeys.dashboardOperations, operations)
   useEffect(() => { const updateRoute = () => setRoute(readRoute()); window.addEventListener('hashchange', updateRoute); return () => window.removeEventListener('hashchange', updateRoute) }, [])
   const page = shellData.placeholderPages.find(item => item.route === route)
-  const topbar = <header className="topbar"><div className="mobile-brand"><span className="brand-mark">L</span>LifeOS</div><CommandPalette navigation={nav} searchService={searchService} /><div className="header-actions"><NotificationCenter data={notificationData} /><button className="icon-button" aria-label="More options"><Icon name="more" /></button><span className="avatar">{shellData.profile.initials}</span></div></header>
+  const topbar = <header className="topbar"><div className="mobile-brand"><span className="brand-mark">L</span>LifeOS</div><CommandPalette registry={commandRegistry} searchService={searchService} /><div className="header-actions"><NotificationCenter data={notificationData} /><button className="icon-button" aria-label="More options"><Icon name="more" /></button><span className="avatar">{shellData.profile.initials}</span></div></header>
   if ((route as RouteName) === 'automations') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<AutomationsPage data={automationsData} icon={Icon} /></main></div>
   if (route === 'automations') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<AutomationsPage data={automationsData} icon={Icon} /></main></div>
   if (route === 'jarvis') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<JarvisPage data={jarvisData} icon={Icon} /></main></div>
