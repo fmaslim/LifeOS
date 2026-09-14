@@ -1,0 +1,1 @@
+export type PipelineStage='Idea'|'Script'|'Thumbnail'|'Video'|'Ready'|'Scheduled'|'Published'|'Archived';export interface PipelineItem{id:string;title:string;format:'Short'|'Long';stage:PipelineStage;platforms:string[];targetDate:string;publishedUrl?:string;generatorRef?:string}export interface ContentPipelineData{items:PipelineItem[]}
