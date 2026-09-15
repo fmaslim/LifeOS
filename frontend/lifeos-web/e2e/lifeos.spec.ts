@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }) => {
 test('navigates across the major LifeOS workspaces', async ({ page }) => {
   const routes = [
     ['today', /Good (morning|afternoon|evening)/i], ['tasks', 'Tasks'], ['goals', 'Goals'], ['calendar', 'Calendar'],
-    ['notes', 'Notes'], ['content', 'YouTube Content Generator'], ['automations', 'Automations'], ['routines', 'Routines'], ['settings', 'Settings'],
+    ['notes', 'Notes'], ['content', 'YouTube Content Generator'], ['automations', 'Automations'], ['routines', 'Routines'], ['planning', 'Planning'], ['settings', 'Settings'],
   ] as const
   for (const [route, heading] of routes) {
     await page.goto(`/#/${route}`)
@@ -57,6 +57,15 @@ test('persists routine step completion after reload without duplicating instance
   await expect(stepAfterReload.getByText('✓ Done')).toBeVisible()
   // Reload re-runs ensureScheduledInstances(); today's instances must not be duplicated.
   await expect(instances).toHaveCount(instanceCountBefore)
+})
+
+test('persists a new project dependency after reload', async ({ page }) => {
+  await page.goto('/#/planning')
+  await page.getByPlaceholder('Why is this blocking?').fill('E2E dependency reason')
+  await page.getByRole('button', { name: 'Add dependency' }).click()
+  await expect(page.getByText('E2E dependency reason')).toBeVisible()
+  await page.reload()
+  await expect(page.getByText('E2E dependency reason')).toBeVisible()
 })
 
 test('persists dashboard visibility preferences', async ({ page }) => {

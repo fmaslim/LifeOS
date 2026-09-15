@@ -43,6 +43,7 @@ import { ConfigurationDriftService, defaultConfigurationManifest, defaultRuntime
 import { ReleaseService, releaseSeed } from './ReleaseService'
 import { CaptureInboxService } from './CaptureInboxService'
 import { RoutineService } from './RoutineService'
+import { PlanningService } from './PlanningService'
 import { localStore } from '../storage/LocalStore'
 import { storageKeys } from '../storage/storageKeys'
 import type { Task } from '../models/task'
@@ -64,6 +65,7 @@ export function createServiceRegistry() {
   const webhookEvents = new WebhookEventProviderService()
   const weeklyReview = new WeeklyReviewService(services, approvalService)
   const routines = new RoutineService(services, approvalService)
+  const planning = new PlanningService(services, approvalService)
   const configurationDrift = new ConfigurationDriftService(defaultConfigurationManifest, defaultRuntimeConfiguration, services.activity, services.notifications)
   const releases = new ReleaseService(releaseSeed, approvalService, services.activity, services.automationHistory)
   const captureInbox = new CaptureInboxService(approvalService, {
@@ -79,7 +81,7 @@ export function createServiceRegistry() {
   ], services.activity, services.notifications, services.automationHistory)
   const dailyBrief = new CompositeDailyBriefService({ ...services, routines })
   const assistant = new LifeOSAssistantService({ ...services, dailyBrief, approvals: approvalService })
-  const registry = { ...services, eventAutomations, webhookEvents, weeklyReview, routines, configurationDrift, releases, captureInbox, productionHealth, dailyBrief, assistant }
+  const registry = { ...services, eventAutomations, webhookEvents, weeklyReview, routines, planning, configurationDrift, releases, captureInbox, productionHealth, dailyBrief, assistant }
   activeRegistry = registry
   return registry
 }

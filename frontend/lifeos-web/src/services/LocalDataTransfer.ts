@@ -1,7 +1,7 @@
 import type { LocalStore } from '../storage/LocalStore.ts'
 import { storageKeys } from '../storage/storageKeys.ts'
 
-export const backupCollections = ['tasks', 'goals', 'notes', 'calendar', 'habits', 'projects', 'routines'] as const
+export const backupCollections = ['tasks', 'goals', 'notes', 'calendar', 'habits', 'projects', 'routines', 'goalProjectLinks', 'projectDependencies'] as const
 export type BackupCollection = typeof backupCollections[number]
 
 export interface LifeOSBackup {
@@ -44,6 +44,7 @@ export function createBackup(store: LocalStore, now = new Date()): LifeOSBackup 
       tasks: store.read(storageKeys.tasks, []), goals: store.read(storageKeys.goals, []), notes: store.read(storageKeys.notes, []),
       calendar: store.read(storageKeys.calendar, []), habits: store.read(storageKeys.habits, []), projects: store.read(storageKeys.projects, []),
       routines: store.read(storageKeys.routines, []),
+      goalProjectLinks: store.read(storageKeys.goalProjectLinks, []), projectDependencies: store.read(storageKeys.projectDependencies, []),
     },
     preferences: { dashboardWidgets: store.read(storageKeys.dashboardWidgets, []) },
   }
