@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }) => {
 test('navigates across the major LifeOS workspaces', async ({ page }) => {
   const routes = [
     ['today', /Good (morning|afternoon|evening)/i], ['tasks', 'Tasks'], ['goals', 'Goals'], ['calendar', 'Calendar'],
-    ['notes', 'Notes'], ['content', 'YouTube Content Generator'], ['automations', 'Automations'], ['routines', 'Routines'], ['planning', 'Planning'], ['backups', 'Backups'], ['settings', 'Settings'],
+    ['notes', 'Notes'], ['content', 'YouTube Content Generator'], ['automations', 'Automations'], ['routines', 'Routines'], ['planning', 'Planning'], ['backups', 'Backups'], ['next-actions', 'Next Actions'], ['settings', 'Settings'],
   ] as const
   for (const [route, heading] of routes) {
     await page.goto(`/#/${route}`)
@@ -77,6 +77,29 @@ test('creates a backup, verifies its integrity, and keeps it after reload', asyn
   await expect(card.locator('dd.verified')).toBeVisible()
   await page.reload()
   await expect(page.locator('.backup-card').first()).toBeVisible()
+})
+
+test('dismissing a next-action recommendation persists after reload and does not immediately reappear', async ({ page }) => {
+  await page.goto('/#/next-actions')
+  const card = page.locator('.next-action-card', { hasText: 'Reconcile rental receipts' })
+  await expect(card).toBeVisible()
+  await card.getByRole('button', { name: 'Dismiss' }).click()
+  await expect(page.locator('.next-action-card', { hasText: 'Reconcile rental receipts' })).toHaveCount(0)
+  await page.reload()
+  // The dismissed recommendation's evidence hasn't changed, so it must not resurface just from a reload.
+  await expect(page.locator('.next-action-card', { hasText: 'Reconcile rental receipts' })).toHaveCount(0)
+})
+
+test('accepting a next-action recommendation requires approval before anything changes', async ({ page }) => {
+  await page.goto('/#/next-actions')
+  const card = page.locator('.next-action-card', { hasText: 'Book annual physical' })
+  await expect(card.getByRole('button', { name: 'Accept' })).toBeVisible()
+  await card.getByRole('button', { name: 'Accept' }).click()
+  await expect(card.getByRole('link', { name: 'Awaiting approval →' })).toBeVisible()
+  await expect(card.getByRole('button', { name: 'Accept' })).toHaveCount(0)
+  // Nothing was written yet: the recommendation is still pending, not applied, until approved from the Approval Inbox.
+  await page.reload()
+  await expect(page.locator('.next-action-card', { hasText: 'Book annual physical' }).getByRole('link', { name: 'Awaiting approval →' })).toBeVisible()
 })
 
 test('persists dashboard visibility preferences', async ({ page }) => {

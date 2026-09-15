@@ -39,6 +39,7 @@ const HomePage = lazy(() => import('./components/HomePage').then(module => ({ de
 const JarvisPage = lazy(() => import('./components/JarvisPage').then(module => ({ default: module.JarvisPage })))
 const KpisPage = lazy(() => import('./components/KpisPage').then(module => ({ default: module.KpisPage })))
 const LearningPage = lazy(() => import('./components/LearningPage').then(module => ({ default: module.LearningPage })))
+const NextActionsPage = lazy(() => import('./components/NextActionsPage').then(module => ({ default: module.NextActionsPage })))
 const NotesPage = lazy(() => import('./components/NotesPage').then(module => ({ default: module.NotesPage })))
 const PlaceholderPage = lazy(() => import('./components/PlaceholderPage').then(module => ({ default: module.PlaceholderPage })))
 const ProjectsPage = lazy(() => import('./components/ProjectsPage').then(module => ({ default: module.ProjectsPage })))
@@ -133,6 +134,7 @@ function AppRoutes() {
   if (route === 'activity') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<ActivityPage data={activityData} /></main></div>
   if (route === 'projects') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<ProjectsPage data={projectData} /></main></div>
   if (route === 'planning') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<PlanningPage service={services.planning} approvals={services.approvals} goals={goalData} projects={projectData} /></main></div>
+  if (route === 'next-actions') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<NextActionsPage service={services.nextActions} approvals={services.approvals} /></main></div>
   if (route === 'habits') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<HabitsPage data={habitData} /></main></div>
   if (route === 'routines') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<RoutinesPage service={services.routines} tasks={taskData} habits={habitData} automations={automationsData} /></main></div>
   if (route === 'learning') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<LearningPage data={learningData} /></main></div>
