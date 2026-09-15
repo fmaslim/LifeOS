@@ -1,0 +1,11 @@
+import { useState } from 'react'
+import type { CaptureKind } from '../models/capture'
+import type { CaptureInboxService } from '../services/CaptureInboxService'
+import './CaptureInboxPage.css'
+
+export function CaptureInboxPage({ service }: { service: CaptureInboxService }) {
+  const [text, setText] = useState(''); const [kind, setKind] = useState<CaptureKind>('unclassified'); const [, refresh] = useState(0); const items = service.list()
+  const add = () => { if (!text.trim()) return; service.capture(text, kind); setText(''); refresh(value => value + 1) }
+  const organize = (id: string) => { const suggestion = service.suggest(id); if (!suggestion) return; service.requestMove(id, suggestion.destination); refresh(value => value + 1) }
+  return <div className="dashboard capture-page"><section className="welcome"><div><p className="eyebrow">Quick capture</p><h1>Inbox</h1><p className="subtitle">Catch it now. Decide where it belongs later.</p></div></section><section className="panel capture-form"><input value={text} onChange={event => setText(event.target.value)} onKeyDown={event => { if (event.key === 'Enter') add() }} placeholder="Task, note, link, reminder, or idea…" aria-label="Capture text" /><select value={kind} onChange={event => setKind(event.target.value as CaptureKind)} aria-label="Capture type"><option value="unclassified">Unclassified</option><option value="task">Task</option><option value="note">Note</option><option value="idea">Idea</option><option value="link">Link</option><option value="reminder">Reminder</option><option value="project-candidate">Project candidate</option></select><button className="primary-button" onClick={add}>Capture</button></section><section className="capture-list">{items.map(item => <article className="panel" key={item.id}><header><strong>{item.text}</strong><span>{item.kind}</span></header><small>{new Date(item.capturedAt).toLocaleString()} · {item.source}</small><footer><span>{item.state}</span>{item.state === 'inbox' && <button className="text-button" onClick={() => organize(item.id)}>Suggest & request move</button>}{item.destination && <a href={`#/${item.destination}`}>Open {item.destination}</a>}</footer></article>)}</section></div>
+}

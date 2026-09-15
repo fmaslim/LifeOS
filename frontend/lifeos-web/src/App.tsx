@@ -22,6 +22,7 @@ const AutomationHistoryPage = lazy(() => import('./components/AutomationHistoryP
 const AutomationsPage = lazy(() => import('./components/AutomationsPage').then(module => ({ default: module.AutomationsPage })))
 const BudgetPage = lazy(() => import('./components/BudgetPage').then(module => ({ default: module.BudgetPage })))
 const CalendarPage = lazy(() => import('./components/CalendarPage').then(module => ({ default: module.CalendarPage })))
+const CaptureInboxPage = lazy(() => import('./components/CaptureInboxPage').then(module => ({ default: module.CaptureInboxPage })))
 const ContactsPage = lazy(() => import('./components/ContactsPage').then(module => ({ default: module.ContactsPage })))
 const DailyBriefPage = lazy(() => import('./components/DailyBriefPage').then(module => ({ default: module.DailyBriefPage })))
 const ContentPage = lazy(() => import('./components/ContentPage').then(module => ({ default: module.ContentPage })))
@@ -106,6 +107,7 @@ function AppRoutes() {
   useEffect(() => { const updateRoute = () => setRoute(readRoute()); window.addEventListener('hashchange', updateRoute); return () => window.removeEventListener('hashchange', updateRoute) }, [])
   const page = shellData.placeholderPages.find(item => item.route === route)
   const topbar = <header className="topbar"><div className="mobile-brand"><span className="brand-mark">L</span>LifeOS</div><CommandPalette registry={commandRegistry} searchService={searchService} /><div className="header-actions"><NotificationCenter data={notificationData} /><button className="icon-button" aria-label="More options"><Icon name="more" /></button><span className="avatar">{shellData.profile.initials}</span></div></header>
+  if (route === 'inbox') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<CaptureInboxPage service={services.captureInbox} /></main></div>
   if (route === 'production-health') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<ProductionHealthPage service={services.productionHealth} /></main></div>
   if (route === 'releases') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<ReleasesPage service={services.releases} /></main></div>
   if (route === 'daily-brief') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<DailyBriefPage data={dailyBriefData} /></main></div>

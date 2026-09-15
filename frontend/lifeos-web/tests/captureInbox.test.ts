@@ -1,0 +1,9 @@
+import assert from 'node:assert/strict'
+import test from 'node:test'
+import type { LocalStore } from '../src/storage/LocalStore.ts'
+import { ApprovalService } from '../src/services/ApprovalService.ts'
+import { CaptureInboxService } from '../src/services/CaptureInboxService.ts'
+class MemoryStore implements LocalStore { values = new Map<string, unknown>(); read<T>(key: string, fallback: T) { return (this.values.get(key) ?? fallback) as T }; write<T>(key: string, value: T) { this.values.set(key, structuredClone(value)) }; remove(key: string) { this.values.delete(key) } }
+class ApprovalStorage { value = ''; getItem() { return this.value || null }; setItem(_key: string, value: string) { this.value = value } }
+test('captures preserve source and time before classification', () => { const service = new CaptureInboxService(new ApprovalService(undefined, new ApprovalStorage()), {}, undefined, new MemoryStore()); const item = service.capture('Read https://example.com', 'link', 'command-palette', new Date('2026-09-15T05:00:00Z')); assert.equal(item.source, 'command-palette'); assert.equal(service.suggest(item.id)?.destination, 'reading'); assert.equal(service.list()[0]?.state, 'inbox') })
+test('moves require approval and retries cannot duplicate a destination', async () => { const approvals = new ApprovalService(undefined, new ApprovalStorage()); let moves = 0; const service = new CaptureInboxService(approvals, { tasks: { move: item => { moves++; return `task-${item.id}` } } }, undefined, new MemoryStore()); const item = service.capture('Call contractor', 'task'); const request = service.requestMove(item.id, 'tasks')!; assert.equal(moves, 0); approvals.decide(request.id, 'approved'); await approvals.executeApproved(request.id); await approvals.executeApproved(request.id); assert.equal(moves, 1); assert.equal(service.list()[0]?.destinationId, `task-${item.id}`); assert.equal(service.requestMove(item.id, 'tasks'), undefined) })
