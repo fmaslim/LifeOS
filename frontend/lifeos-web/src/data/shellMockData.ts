@@ -7,6 +7,7 @@ export const shellMockData: ShellData = {
     { label: 'Inbox', route: 'inbox', icon: 'file' },
     { label: 'Production Health', route: 'production-health', icon: 'alert' },
     { label: 'Releases', route: 'releases', icon: 'refresh' },
+    { label: 'Backups', route: 'backups', icon: 'upload' },
     { label: 'KPIs', route: 'kpis', icon: 'chart' },
     { label: 'AI Assistant', route: 'assistant', icon: 'sparkles' },
     { label: 'Approvals', route: 'approvals', icon: 'review' },

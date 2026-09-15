@@ -41,6 +41,7 @@ import { WeeklyReviewService } from './WeeklyReviewService'
 import { createDefaultProductionHealthProbes, ProductionHealthService } from './ProductionHealthService'
 import { ConfigurationDriftService, defaultConfigurationManifest, defaultRuntimeConfiguration } from './ConfigurationDriftService'
 import { ReleaseService, releaseSeed } from './ReleaseService'
+import { BackupService } from './BackupService'
 import { CaptureInboxService } from './CaptureInboxService'
 import { RoutineService } from './RoutineService'
 import { PlanningService } from './PlanningService'
@@ -68,6 +69,7 @@ export function createServiceRegistry() {
   const planning = new PlanningService(services, approvalService)
   const configurationDrift = new ConfigurationDriftService(defaultConfigurationManifest, defaultRuntimeConfiguration, services.activity, services.notifications)
   const releases = new ReleaseService(releaseSeed, approvalService, services.activity, services.automationHistory)
+  const backups = new BackupService(approvalService, services.activity, services.notifications)
   const captureInbox = new CaptureInboxService(approvalService, {
     tasks: { move: item => { const id = `capture-task-${item.id}`; const values = localStore.read<Task[]>(storageKeys.tasks, services.tasks.getTaskData().tasks); if (!values.some(value => value.id === id)) localStore.write(storageKeys.tasks, [...values, { id, title: item.text, domain: 'Personal', priority: 'medium', status: 'todo', source: 'Capture Inbox' }]); return id } },
     notes: { move: item => { const id = `capture-note-${item.id}`; const values = localStore.read<Note[]>(storageKeys.notes, services.notes.getNoteData().notes); if (!values.some(value => value.id === id)) localStore.write(storageKeys.notes, [...values, { id, title: item.text.slice(0, 80), body: item.text, domain: 'Personal', tags: ['capture'], pinned: false, inbox: false, createdAt: item.capturedAt, updatedAt: item.capturedAt }]); return id } },
@@ -81,7 +83,7 @@ export function createServiceRegistry() {
   ], services.activity, services.notifications, services.automationHistory)
   const dailyBrief = new CompositeDailyBriefService({ ...services, routines })
   const assistant = new LifeOSAssistantService({ ...services, dailyBrief, approvals: approvalService })
-  const registry = { ...services, eventAutomations, webhookEvents, weeklyReview, routines, planning, configurationDrift, releases, captureInbox, productionHealth, dailyBrief, assistant }
+  const registry = { ...services, eventAutomations, webhookEvents, weeklyReview, routines, planning, configurationDrift, releases, backups, captureInbox, productionHealth, dailyBrief, assistant }
   activeRegistry = registry
   return registry
 }
