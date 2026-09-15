@@ -39,6 +39,7 @@ import { WebhookEventProviderService } from './WebhookEventProviderService'
 import { MockKpiService } from './KpiService'
 import { WeeklyReviewService } from './WeeklyReviewService'
 import { createDefaultProductionHealthProbes, ProductionHealthService } from './ProductionHealthService'
+import { ConfigurationDriftService, defaultConfigurationManifest, defaultRuntimeConfiguration } from './ConfigurationDriftService'
 
 let activeRegistry: unknown
 
@@ -52,10 +53,14 @@ export function createServiceRegistry() {
   const eventAutomations = new EventAutomationService(services.automationHistory, services.activity)
   const webhookEvents = new WebhookEventProviderService()
   const weeklyReview = new WeeklyReviewService(services, approvalService)
-  const productionHealth = new ProductionHealthService(createDefaultProductionHealthProbes(services.integrationProviders), services.activity, services.notifications, services.automationHistory)
+  const configurationDrift = new ConfigurationDriftService(defaultConfigurationManifest, defaultRuntimeConfiguration, services.activity, services.notifications)
+  const productionHealth = new ProductionHealthService([
+    ...createDefaultProductionHealthProbes(services.integrationProviders),
+    { id: 'configuration', target: 'backend', label: 'Configuration drift', route: 'production-health', run: async () => { const report = configurationDrift.evaluate(); return { state: report.healthy ? 'healthy' as const : 'degraded' as const, message: report.healthy ? 'Expected configuration shape is present.' : `${report.findings.length} deterministic drift finding(s).` } } },
+  ], services.activity, services.notifications, services.automationHistory)
   const dailyBrief = new CompositeDailyBriefService(services)
   const assistant = new LifeOSAssistantService({ ...services, dailyBrief, approvals: approvalService })
-  const registry = { ...services, eventAutomations, webhookEvents, weeklyReview, productionHealth, dailyBrief, assistant }
+  const registry = { ...services, eventAutomations, webhookEvents, weeklyReview, configurationDrift, productionHealth, dailyBrief, assistant }
   activeRegistry = registry
   return registry
 }
