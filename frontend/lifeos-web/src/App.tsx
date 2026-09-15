@@ -20,6 +20,7 @@ const ApprovalInboxPage = lazy(() => import('./components/ApprovalInboxPage').th
 const AutomationBuilderPage = lazy(() => import('./components/AutomationBuilderPage').then(module => ({ default: module.AutomationBuilderPage })))
 const AutomationHistoryPage = lazy(() => import('./components/AutomationHistoryPage').then(module => ({ default: module.AutomationHistoryPage })))
 const AutomationsPage = lazy(() => import('./components/AutomationsPage').then(module => ({ default: module.AutomationsPage })))
+const BackupRecoveryPage = lazy(() => import('./components/BackupRecoveryPage').then(module => ({ default: module.BackupRecoveryPage })))
 const BudgetPage = lazy(() => import('./components/BudgetPage').then(module => ({ default: module.BudgetPage })))
 const CalendarPage = lazy(() => import('./components/CalendarPage').then(module => ({ default: module.CalendarPage })))
 const CaptureInboxPage = lazy(() => import('./components/CaptureInboxPage').then(module => ({ default: module.CaptureInboxPage })))
@@ -112,6 +113,7 @@ function AppRoutes() {
   if (route === 'inbox') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<CaptureInboxPage service={services.captureInbox} /></main></div>
   if (route === 'production-health') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<ProductionHealthPage service={services.productionHealth} /></main></div>
   if (route === 'releases') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<ReleasesPage service={services.releases} /></main></div>
+  if (route === 'backups') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<BackupRecoveryPage service={services.backups} /></main></div>
   if (route === 'daily-brief') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<DailyBriefPage data={dailyBriefData} /></main></div>
   if (route === 'schedules') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<SchedulesPage data={scheduleData} /></main></div>
   if (route === 'automation-history') return <div className="app-shell"><Sidebar activeRoute={route} /><main id="main-content" tabIndex={-1} className="main-content">{topbar}<AutomationHistoryPage runs={automationRuns} /></main></div>

@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }) => {
 test('navigates across the major LifeOS workspaces', async ({ page }) => {
   const routes = [
     ['today', /Good (morning|afternoon|evening)/i], ['tasks', 'Tasks'], ['goals', 'Goals'], ['calendar', 'Calendar'],
-    ['notes', 'Notes'], ['content', 'YouTube Content Generator'], ['automations', 'Automations'], ['routines', 'Routines'], ['planning', 'Planning'], ['settings', 'Settings'],
+    ['notes', 'Notes'], ['content', 'YouTube Content Generator'], ['automations', 'Automations'], ['routines', 'Routines'], ['planning', 'Planning'], ['backups', 'Backups'], ['settings', 'Settings'],
   ] as const
   for (const [route, heading] of routes) {
     await page.goto(`/#/${route}`)
@@ -66,6 +66,17 @@ test('persists a new project dependency after reload', async ({ page }) => {
   await expect(page.getByText('E2E dependency reason')).toBeVisible()
   await page.reload()
   await expect(page.getByText('E2E dependency reason')).toBeVisible()
+})
+
+test('creates a backup, verifies its integrity, and keeps it after reload', async ({ page }) => {
+  await page.goto('/#/backups')
+  await page.getByRole('button', { name: 'Run backup now' }).click()
+  const card = page.locator('.backup-card').first()
+  await expect(card).toBeVisible()
+  await card.getByRole('button', { name: 'Verify integrity' }).click()
+  await expect(card.locator('dd.verified')).toBeVisible()
+  await page.reload()
+  await expect(page.locator('.backup-card').first()).toBeVisible()
 })
 
 test('persists dashboard visibility preferences', async ({ page }) => {
