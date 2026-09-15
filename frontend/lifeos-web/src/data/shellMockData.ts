@@ -4,6 +4,7 @@ import type { ShellData } from '../models/shell'
 export const shellMockData: ShellData = {
   profile: { initials: 'FM', name: 'Frank Maslowski', workspaceName: 'Personal workspace' },
   navigation: [
+    { label: 'Inbox', route: 'inbox', icon: 'file' },
     { label: 'Production Health', route: 'production-health', icon: 'alert' },
     { label: 'Releases', route: 'releases', icon: 'refresh' },
     { label: 'KPIs', route: 'kpis', icon: 'chart' },
