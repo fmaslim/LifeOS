@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }) => {
 test('navigates across the major LifeOS workspaces', async ({ page }) => {
   const routes = [
     ['today', /Good (morning|afternoon|evening)/i], ['tasks', 'Tasks'], ['goals', 'Goals'], ['calendar', 'Calendar'],
-    ['notes', 'Notes'], ['content', 'YouTube Content Generator'], ['automations', 'Automations'], ['routines', 'Routines'], ['planning', 'Planning'], ['backups', 'Backups'], ['next-actions', 'Next Actions'], ['settings', 'Settings'],
+    ['notes', 'Notes'], ['content', 'YouTube Content Generator'], ['automations', 'Automations'], ['routines', 'Routines'], ['planning', 'Planning'], ['backups', 'Backups'], ['next-actions', 'Next Actions'], ['smoke-checks', 'Production Smoke Checks'], ['settings', 'Settings'],
   ] as const
   for (const [route, heading] of routes) {
     await page.goto(`/#/${route}`)
