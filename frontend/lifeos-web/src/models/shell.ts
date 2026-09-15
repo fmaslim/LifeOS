@@ -1,6 +1,6 @@
 import type { DashboardIcon } from './dashboard'
 
-export type RouteName = 'dashboard' | 'inbox' | 'production-health' | 'releases' | 'daily-brief' | 'weekly-review' | 'assistant' | 'approvals' | 'today' | 'activity' | 'calendar' | 'notes' | 'tasks' | 'goals' | 'kpis' | 'projects' | 'habits' | 'learning' | 'contacts' | 'reading' | 'documents' | 'budget' | 'property' | 'content-pipeline' | 'automation-builder' | 'automations' | 'schedules' | 'automation-history' | 'github' | 'agent-control' | 'content' | 'jarvis' | 'dociq' | 'finances' | 'home' | 'health' | 'settings'
+export type RouteName = 'dashboard' | 'inbox' | 'production-health' | 'releases' | 'daily-brief' | 'weekly-review' | 'assistant' | 'approvals' | 'today' | 'activity' | 'calendar' | 'notes' | 'tasks' | 'goals' | 'kpis' | 'projects' | 'habits' | 'routines' | 'learning' | 'contacts' | 'reading' | 'documents' | 'budget' | 'property' | 'content-pipeline' | 'automation-builder' | 'automations' | 'schedules' | 'automation-history' | 'github' | 'agent-control' | 'content' | 'jarvis' | 'dociq' | 'finances' | 'home' | 'health' | 'settings'
 
 export interface ShellNavigationItem { label: string; route: RouteName; icon: DashboardIcon }
 export interface WorkspaceProfile { initials: string; name: string; workspaceName: string }

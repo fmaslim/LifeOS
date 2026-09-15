@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }) => {
 test('navigates across the major LifeOS workspaces', async ({ page }) => {
   const routes = [
     ['today', /Good (morning|afternoon|evening)/i], ['tasks', 'Tasks'], ['goals', 'Goals'], ['calendar', 'Calendar'],
-    ['notes', 'Notes'], ['content', 'YouTube Content Generator'], ['automations', 'Automations'], ['settings', 'Settings'],
+    ['notes', 'Notes'], ['content', 'YouTube Content Generator'], ['automations', 'Automations'], ['routines', 'Routines'], ['settings', 'Settings'],
   ] as const
   for (const [route, heading] of routes) {
     await page.goto(`/#/${route}`)
@@ -42,6 +42,21 @@ test('persists note capture and goal milestone changes', async ({ page }) => {
   await milestone.click()
   await page.reload()
   await expect(page.locator('.milestone:not([disabled])').first()).toHaveAttribute('aria-pressed', before === 'true' ? 'false' : 'true')
+})
+
+test('persists routine step completion after reload without duplicating instances', async ({ page }) => {
+  await page.goto('/#/routines')
+  const instances = page.locator('.routine-instance-list .routine-instance')
+  const step = page.locator('.routine-step', { hasText: 'Make the bed' }).first()
+  await expect(step.getByRole('button', { name: 'Complete' })).toBeVisible()
+  const instanceCountBefore = await instances.count()
+  await step.getByRole('button', { name: 'Complete' }).click()
+  await expect(step.getByText('✓ Done')).toBeVisible()
+  await page.reload()
+  const stepAfterReload = page.locator('.routine-step', { hasText: 'Make the bed' }).first()
+  await expect(stepAfterReload.getByText('✓ Done')).toBeVisible()
+  // Reload re-runs ensureScheduledInstances(); today's instances must not be duplicated.
+  await expect(instances).toHaveCount(instanceCountBefore)
 })
 
 test('persists dashboard visibility preferences', async ({ page }) => {

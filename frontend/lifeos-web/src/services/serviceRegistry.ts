@@ -42,6 +42,7 @@ import { createDefaultProductionHealthProbes, ProductionHealthService } from './
 import { ConfigurationDriftService, defaultConfigurationManifest, defaultRuntimeConfiguration } from './ConfigurationDriftService'
 import { ReleaseService, releaseSeed } from './ReleaseService'
 import { CaptureInboxService } from './CaptureInboxService'
+import { RoutineService } from './RoutineService'
 import { localStore } from '../storage/LocalStore'
 import { storageKeys } from '../storage/storageKeys'
 import type { Task } from '../models/task'
@@ -62,6 +63,7 @@ export function createServiceRegistry() {
   const eventAutomations = new EventAutomationService(services.automationHistory, services.activity)
   const webhookEvents = new WebhookEventProviderService()
   const weeklyReview = new WeeklyReviewService(services, approvalService)
+  const routines = new RoutineService(services, approvalService)
   const configurationDrift = new ConfigurationDriftService(defaultConfigurationManifest, defaultRuntimeConfiguration, services.activity, services.notifications)
   const releases = new ReleaseService(releaseSeed, approvalService, services.activity, services.automationHistory)
   const captureInbox = new CaptureInboxService(approvalService, {
@@ -75,9 +77,9 @@ export function createServiceRegistry() {
     ...createDefaultProductionHealthProbes(services.integrationProviders),
     { id: 'configuration', target: 'backend', label: 'Configuration drift', route: 'production-health', run: async () => { const report = configurationDrift.evaluate(); return { state: report.healthy ? 'healthy' as const : 'degraded' as const, message: report.healthy ? 'Expected configuration shape is present.' : `${report.findings.length} deterministic drift finding(s).` } } },
   ], services.activity, services.notifications, services.automationHistory)
-  const dailyBrief = new CompositeDailyBriefService(services)
+  const dailyBrief = new CompositeDailyBriefService({ ...services, routines })
   const assistant = new LifeOSAssistantService({ ...services, dailyBrief, approvals: approvalService })
-  const registry = { ...services, eventAutomations, webhookEvents, weeklyReview, configurationDrift, releases, captureInbox, productionHealth, dailyBrief, assistant }
+  const registry = { ...services, eventAutomations, webhookEvents, weeklyReview, routines, configurationDrift, releases, captureInbox, productionHealth, dailyBrief, assistant }
   activeRegistry = registry
   return registry
 }
