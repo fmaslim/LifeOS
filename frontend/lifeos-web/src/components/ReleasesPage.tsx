@@ -1,0 +1,9 @@
+import { useState } from 'react'
+import type { ReleaseService } from '../services/ReleaseService'
+import './ReleasesPage.css'
+
+export function ReleasesPage({ service }: { service: ReleaseService }) {
+  const [requested, setRequested] = useState(''); const releases = service.list()
+  const rollback = (id: string) => { service.requestRollback(id); setRequested(id) }
+  return <div className="dashboard releases-page"><section className="welcome"><div><p className="eyebrow">Deployment operations</p><h1>Releases</h1><p className="subtitle">Exact commit, build, image, and revision provenance for each environment.</p></div></section><section className="release-grid">{releases.map(release => <article className="panel release-card" key={release.id}><header><strong>{release.component}</strong><span className={release.state}>{release.state}</span></header><dl><div><dt>Environment</dt><dd>{release.environment}</dd></div><div><dt>Commit</dt><dd>{release.sourceUrl ? <a href={release.sourceUrl}>{release.commitSha.slice(0, 12)}</a> : release.commitSha.slice(0, 12)}</dd></div><div><dt>Branch / build</dt><dd>{release.branch} · {release.buildId}</dd></div><div><dt>Image</dt><dd>{release.imageId}</dd></div><div><dt>Revision</dt><dd>{release.revisionId}</dd></div><div><dt>Deployed</dt><dd>{new Date(release.deployedAt).toLocaleString()}</dd></div></dl>{release.state !== 'current' && (requested === release.id ? <a href="#/approvals">Approval requested · Open inbox</a> : <button className="primary-button" onClick={() => rollback(release.id)}>Request rollback</button>)}</article>)}</section><section className="panel rollback-guide"><h2>Safe rollback</h2><p>Review compatibility, request approval, execute through the deployment provider, then run production smoke checks. LifeOS never rolls production back silently.</p></section></div>
+}

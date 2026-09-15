@@ -1,0 +1,8 @@
+import assert from 'node:assert/strict'
+import test from 'node:test'
+import { ApprovalService } from '../src/services/ApprovalService.ts'
+import { ReleaseService } from '../src/services/ReleaseService.ts'
+class Storage { value = ''; getItem() { return this.value || null }; setItem(_key: string, value: string) { this.value = value } }
+const releases = [{ id: 'old', component: 'backend' as const, environment: 'production', commitSha: 'abc', branch: 'main', buildId: 'b1', imageId: 'image@sha256:1', revisionId: 'api-1', deployedAt: '2026-09-14T00:00:00Z', state: 'superseded' as const }, { id: 'new', component: 'backend' as const, environment: 'production', commitSha: 'def', branch: 'main', buildId: 'b2', imageId: 'image@sha256:2', revisionId: 'api-2', deployedAt: '2026-09-15T00:00:00Z', state: 'current' as const }]
+test('release provenance independently resolves current and historical backend deployments', () => { const service = new ReleaseService(releases, new ApprovalService(undefined, new Storage())); assert.equal(service.current('backend')?.commitSha, 'def'); assert.equal(service.list()[1]?.revisionId, 'api-1'); assert.equal(service.guidance('old')?.approvalRequired, true) })
+test('rollback remains approval gated and does not silently change the current release', async () => { const approvals = new ApprovalService(undefined, new Storage()); const service = new ReleaseService(releases, approvals); const request = service.requestRollback('old')!; assert.equal(request.state, 'pending'); assert.equal(service.current('backend')?.id, 'new'); approvals.decide(request.id, 'approved'); await approvals.executeApproved(request.id); assert.equal(service.current('backend')?.id, 'new') })
