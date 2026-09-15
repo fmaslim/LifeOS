@@ -38,6 +38,7 @@ import { EventAutomationService } from './EventAutomationService'
 import { WebhookEventProviderService } from './WebhookEventProviderService'
 import { MockKpiService } from './KpiService'
 import { WeeklyReviewService } from './WeeklyReviewService'
+import { createDefaultProductionHealthProbes, ProductionHealthService } from './ProductionHealthService'
 
 let activeRegistry: unknown
 
@@ -51,9 +52,10 @@ export function createServiceRegistry() {
   const eventAutomations = new EventAutomationService(services.automationHistory, services.activity)
   const webhookEvents = new WebhookEventProviderService()
   const weeklyReview = new WeeklyReviewService(services, approvalService)
+  const productionHealth = new ProductionHealthService(createDefaultProductionHealthProbes(services.integrationProviders), services.activity, services.notifications, services.automationHistory)
   const dailyBrief = new CompositeDailyBriefService(services)
   const assistant = new LifeOSAssistantService({ ...services, dailyBrief, approvals: approvalService })
-  const registry = { ...services, eventAutomations, webhookEvents, weeklyReview, dailyBrief, assistant }
+  const registry = { ...services, eventAutomations, webhookEvents, weeklyReview, productionHealth, dailyBrief, assistant }
   activeRegistry = registry
   return registry
 }
