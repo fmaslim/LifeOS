@@ -41,6 +41,7 @@ import { WeeklyReviewService } from './WeeklyReviewService'
 import { createDefaultProductionHealthProbes, ProductionHealthService } from './ProductionHealthService'
 import { ConfigurationDriftService, defaultConfigurationManifest, defaultRuntimeConfiguration } from './ConfigurationDriftService'
 import { ReleaseService, releaseSeed } from './ReleaseService'
+import { createDefaultSmokeCheckProbes, SmokeCheckService } from './SmokeCheckService'
 import { BackupService } from './BackupService'
 import { CaptureInboxService } from './CaptureInboxService'
 import { RoutineService } from './RoutineService'
@@ -70,6 +71,7 @@ export function createServiceRegistry() {
   const planning = new PlanningService(services, approvalService)
   const configurationDrift = new ConfigurationDriftService(defaultConfigurationManifest, defaultRuntimeConfiguration, services.activity, services.notifications)
   const releases = new ReleaseService(releaseSeed, approvalService, services.activity, services.automationHistory)
+  const smokeChecks = new SmokeCheckService(createDefaultSmokeCheckProbes(), releases, services.activity, services.notifications, services.automationHistory)
   const backups = new BackupService(approvalService, services.activity, services.notifications)
   const captureInbox = new CaptureInboxService(approvalService, {
     tasks: { move: item => { const id = `capture-task-${item.id}`; const values = localStore.read<Task[]>(storageKeys.tasks, services.tasks.getTaskData().tasks); if (!values.some(value => value.id === id)) localStore.write(storageKeys.tasks, [...values, { id, title: item.text, domain: 'Personal', priority: 'medium', status: 'todo', source: 'Capture Inbox' }]); return id } },
@@ -85,7 +87,7 @@ export function createServiceRegistry() {
   const dailyBrief = new CompositeDailyBriefService({ ...services, routines })
   const assistant = new LifeOSAssistantService({ ...services, dailyBrief, approvals: approvalService })
   const nextActions = new NextActionService({ tasks: services.tasks, goals: services.goals, projects: services.projects, planning, calendar: services.calendar, routines, kpis: services.kpis, weeklyReview, dailyBrief }, approvalService)
-  const registry = { ...services, eventAutomations, webhookEvents, weeklyReview, routines, planning, configurationDrift, releases, backups, captureInbox, productionHealth, dailyBrief, assistant, nextActions }
+  const registry = { ...services, eventAutomations, webhookEvents, weeklyReview, routines, planning, configurationDrift, releases, smokeChecks, backups, captureInbox, productionHealth, dailyBrief, assistant, nextActions }
   activeRegistry = registry
   return registry
 }

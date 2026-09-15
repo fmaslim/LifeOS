@@ -6,6 +6,7 @@ export const shellMockData: ShellData = {
   navigation: [
     { label: 'Inbox', route: 'inbox', icon: 'file' },
     { label: 'Production Health', route: 'production-health', icon: 'alert' },
+    { label: 'Smoke Checks', route: 'smoke-checks', icon: 'scan' },
     { label: 'Releases', route: 'releases', icon: 'refresh' },
     { label: 'Backups', route: 'backups', icon: 'upload' },
     { label: 'KPIs', route: 'kpis', icon: 'chart' },
