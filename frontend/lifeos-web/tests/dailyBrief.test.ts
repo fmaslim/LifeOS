@@ -30,3 +30,21 @@ test('an unavailable provider degrades gracefully without hiding local signals',
   assert.match(brief.warnings.at(-1) ?? '', /unavailable/)
   assert.equal(brief.signals.length, 4)
 })
+
+test('routine instances are optional but, when supplied, surface a signal, an action, and missed warnings', () => {
+  const withoutRoutines = composeDailyBrief(sources(), new Date('2026-09-14T08:30:00.000Z'))
+  assert.equal(withoutRoutines.signals.length, 4)
+  assert.equal(withoutRoutines.actions.some(action => action.id === 'routines-due'), false)
+
+  const data = sources()
+  data.routines = { instances: [
+    { id: 'r1--2026-09-14', routineId: 'r1', routineName: 'Morning launch', kind: 'morning', date: '2026-09-14', status: 'scheduled', windowEnd: '2026-09-14T09:00:00.000Z', steps: [] },
+    { id: 'r2--2026-09-14', routineId: 'r2', routineName: 'Evening wind-down', kind: 'evening', date: '2026-09-14', status: 'missed', windowEnd: '2026-09-14T07:00:00.000Z', steps: [] },
+  ] }
+  const brief = composeDailyBrief(data, new Date('2026-09-14T08:30:00.000Z'))
+  assert.equal(brief.signals.length, 5)
+  assert.equal(brief.signals.at(-1)?.id, 'routines')
+  assert.equal(brief.signals.at(-1)?.status, 'attention')
+  assert.ok(brief.actions.some(action => action.id === 'routines-due' && action.reason.includes('Morning launch')))
+  assert.ok(brief.warnings.some(warning => /missed: Evening wind-down/.test(warning)))
+})

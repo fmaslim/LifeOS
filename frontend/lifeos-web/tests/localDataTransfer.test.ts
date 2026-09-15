@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { parseBackup, serializeBackup, type LifeOSBackup } from '../src/services/LocalDataTransfer.ts'
 
-const backup: LifeOSBackup = { schema: 'lifeos-local-backup', version: 1, exportedAt: '2026-09-14T00:00:00.000Z', data: { tasks: [{ id: 't1' }], goals: [], notes: [{ id: 'n1' }], calendar: [], habits: [], projects: [] }, preferences: { dashboardWidgets: [{ id: 'summary', visible: true }] } }
+const backup: LifeOSBackup = { schema: 'lifeos-local-backup', version: 1, exportedAt: '2026-09-14T00:00:00.000Z', data: { tasks: [{ id: 't1' }], goals: [], notes: [{ id: 'n1' }], calendar: [], habits: [], projects: [], routines: [] }, preferences: { dashboardWidgets: [{ id: 'summary', visible: true }] } }
 
 test('round-trips an allowlisted LifeOS backup and previews counts', () => {
   const preview = parseBackup(serializeBackup(backup))
