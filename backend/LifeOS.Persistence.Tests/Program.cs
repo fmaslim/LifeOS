@@ -41,6 +41,10 @@ try
     await VerifyAuthenticationContract();
     Console.WriteLine("Persistence foundation tests passed.");
 }
+finally
+{
+    if (Directory.Exists(root)) Directory.Delete(root, true);
+}
 
 static async Task VerifyAuthenticationContract()
 {
@@ -75,10 +79,6 @@ static async Task VerifyAuthenticationContract()
 
     var afterLogout = await sessionClient.GetAsync("/api/auth/session");
     Assert(afterLogout.StatusCode == HttpStatusCode.Unauthorized, "logged-out session should be protected");
-}
-finally
-{
-    if (Directory.Exists(root)) Directory.Delete(root, true);
 }
 
 static void Assert(bool condition, string message)
