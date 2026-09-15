@@ -49,7 +49,7 @@ finally
 static async Task VerifyAuthenticationContract()
 {
     const string password = "test-owner-password";
-    await using var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+    await using var factory = new WebApplicationFactory<LifeOS.Api.ApiAssemblyMarker>().WithWebHostBuilder(builder =>
         builder.UseSetting("Auth:OwnerPassword", password)
             .UseSetting("Auth:SigningKey", "test-only-signing-key-that-is-at-least-thirty-two-bytes")
             .UseSetting("Auth:SessionHours", "1"));
