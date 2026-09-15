@@ -45,6 +45,7 @@ import { BackupService } from './BackupService'
 import { CaptureInboxService } from './CaptureInboxService'
 import { RoutineService } from './RoutineService'
 import { PlanningService } from './PlanningService'
+import { NextActionService } from './NextActionService'
 import { localStore } from '../storage/LocalStore'
 import { storageKeys } from '../storage/storageKeys'
 import type { Task } from '../models/task'
@@ -83,7 +84,8 @@ export function createServiceRegistry() {
   ], services.activity, services.notifications, services.automationHistory)
   const dailyBrief = new CompositeDailyBriefService({ ...services, routines })
   const assistant = new LifeOSAssistantService({ ...services, dailyBrief, approvals: approvalService })
-  const registry = { ...services, eventAutomations, webhookEvents, weeklyReview, routines, planning, configurationDrift, releases, backups, captureInbox, productionHealth, dailyBrief, assistant }
+  const nextActions = new NextActionService({ tasks: services.tasks, goals: services.goals, projects: services.projects, planning, calendar: services.calendar, routines, kpis: services.kpis, weeklyReview, dailyBrief }, approvalService)
+  const registry = { ...services, eventAutomations, webhookEvents, weeklyReview, routines, planning, configurationDrift, releases, backups, captureInbox, productionHealth, dailyBrief, assistant, nextActions }
   activeRegistry = registry
   return registry
 }
