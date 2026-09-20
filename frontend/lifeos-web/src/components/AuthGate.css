@@ -31,7 +31,7 @@
 .auth-kicker {
   margin: 24px 0 8px;
   color: #9f91ff;
-  font-size: 0.78rem;
+  font-size:calc(0.78rem * var(--font-scale));
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -39,7 +39,7 @@
 
 .auth-card h1 {
   margin: 0;
-  font-size: clamp(2rem, 7vw, 2.7rem);
+  font-size:clamp(calc(2rem * var(--font-scale)), calc(7vw * var(--font-scale)), calc(2.7rem * var(--font-scale)));
 }
 
 .auth-copy,
@@ -55,7 +55,7 @@
 }
 
 .auth-form label {
-  font-size: 0.86rem;
+  font-size:calc(0.86rem * var(--font-scale));
   font-weight: 650;
 }
 
@@ -99,5 +99,5 @@
 
 .auth-note {
   margin-bottom: 0;
-  font-size: 0.86rem;
+  font-size:calc(0.86rem * var(--font-scale));
 }

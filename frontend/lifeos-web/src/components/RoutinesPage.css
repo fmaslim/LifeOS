@@ -1,22 +1,22 @@
 .routines-page section{margin-bottom:18px}
 .routine-form{display:grid;gap:12px;padding:20px}
-.routine-form label{display:grid;gap:6px;color:#8e919f;font-size:9px;text-transform:uppercase}
-.routine-form input,.routine-form select{border:1px solid #393b47;border-radius:6px;background:#20212a;color:#dddde5;padding:9px;font:inherit;font-size:11px}
+.routine-form label{display:grid;gap:6px;color:#8e919f;font-size:calc(9px * var(--font-scale));text-transform:uppercase}
+.routine-form input,.routine-form select{border:1px solid #393b47;border-radius:6px;background:#20212a;color:#dddde5;padding:9px;font:inherit;font-size:calc(11px * var(--font-scale))}
 .routine-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .routine-weekdays{display:flex;flex-wrap:wrap;gap:10px}
-.routine-weekdays label{flex-direction:row;align-items:center;gap:5px;text-transform:none;font-size:11px;color:#c7c9d3}
+.routine-weekdays label{flex-direction:row;align-items:center;gap:5px;text-transform:none;font-size:calc(11px * var(--font-scale));color:#c7c9d3}
 .routine-step-list{display:grid;gap:8px}
 .routine-step-editor{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,.8fr) minmax(0,1fr) auto;gap:8px;align-items:center}
-.routine-step-editor input,.routine-step-editor select{border:1px solid #393b47;border-radius:6px;background:#20212a;color:#dddde5;padding:8px;font:inherit;font-size:11px}
-.routine-step-editor button{border:0;background:none;color:#aa92ed;font-size:15px;cursor:pointer}
+.routine-step-editor input,.routine-step-editor select{border:1px solid #393b47;border-radius:6px;background:#20212a;color:#dddde5;padding:8px;font:inherit;font-size:calc(11px * var(--font-scale))}
+.routine-step-editor button{border:0;background:none;color:#aa92ed;font-size:calc(15px * var(--font-scale));cursor:pointer}
 
 .routine-instance-list{display:grid;gap:12px}
 .routine-instance{padding:16px;border:1px solid #2c2e39;border-radius:10px;background:#191a22}
 .routine-instance header{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.routine-instance header h3{margin:6px 0 0;font-size:14px}
+.routine-instance header h3{margin:6px 0 0;font-size:calc(14px * var(--font-scale))}
 .routine-instance>.text-button{margin:8px 0 0;padding:0}
 
-.routine-status{padding:4px 8px;border-radius:999px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.routine-status{padding:4px 8px;border-radius:999px;font-size:calc(9px * var(--font-scale));font-weight:700;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
 .routine-status-scheduled{background:#242634;color:#9295a3}
 .routine-status-in-progress{background:#292650;color:#bcaafa}
 .routine-status-completed{background:#123524;color:#5fd79b}
@@ -24,20 +24,20 @@
 .routine-status-missed{background:#3a1a1f;color:#f18b96}
 
 .routine-step-checklist{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:6px}
-.routine-step{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid #262832;border-radius:7px;background:#20212a;font-size:11px}
+.routine-step{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid #262832;border-radius:7px;background:#20212a;font-size:calc(11px * var(--font-scale))}
 .routine-step-title{display:flex;flex-direction:column;gap:2px}
-.routine-step-title small{color:#797c89;text-transform:capitalize;font-size:9px}
+.routine-step-title small{color:#797c89;text-transform:capitalize;font-size:calc(9px * var(--font-scale))}
 .routine-step-actions{display:flex;gap:6px}
-.routine-step-actions button{border:1px solid #393b47;border-radius:6px;background:none;color:#dddde5;padding:5px 9px;font:inherit;font-size:10px;cursor:pointer}
-.routine-step-done{color:#5fd79b;font-size:10px}
-.routine-step-missed{color:#f18b96;font-size:10px}
-.routine-step-approval{color:#ae95f1;font-size:10px;text-decoration:none}
+.routine-step-actions button{border:1px solid #393b47;border-radius:6px;background:none;color:#dddde5;padding:5px 9px;font:inherit;font-size:calc(10px * var(--font-scale));cursor:pointer}
+.routine-step-done{color:#5fd79b;font-size:calc(10px * var(--font-scale))}
+.routine-step-missed{color:#f18b96;font-size:calc(10px * var(--font-scale))}
+.routine-step-approval{color:#ae95f1;font-size:calc(10px * var(--font-scale));text-decoration:none}
 .routine-step-done + .routine-step-missed{display:none}
 
-.routines-empty{color:#797c89;font-size:11px;padding:8px 0}
+.routines-empty{color:#797c89;font-size:calc(11px * var(--font-scale));padding:8px 0}
 
 .routine-history-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
-.routine-history-list li{display:grid;grid-template-columns:90px minmax(0,1fr) auto auto;align-items:center;gap:10px;padding:9px 10px;border:1px solid #262832;border-radius:7px;background:#20212a;font-size:11px}
+.routine-history-list li{display:grid;grid-template-columns:90px minmax(0,1fr) auto auto;align-items:center;gap:10px;padding:9px 10px;border:1px solid #262832;border-radius:7px;background:#20212a;font-size:calc(11px * var(--font-scale))}
 .routine-history-list li span:first-child{color:#797c89}
 
 @media(max-width:760px){
