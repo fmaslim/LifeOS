@@ -2,52 +2,52 @@
 .planning-summary{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));max-width:820px;margin-bottom:17px;border:1px solid #2b2d38;border-radius:10px;background:#191a22}
 .planning-summary article{padding:15px 18px;border-right:1px solid #2b2d38}
 .planning-summary article:last-child{border:0}
-.planning-summary span{font-size:20px;font-weight:750;letter-spacing:-.6px;color:#f3f1ff}
-.planning-summary p{margin:3px 0 0;color:#828593;font-size:10px}
+.planning-summary span{font-size:calc(20px * var(--font-scale));font-weight:750;letter-spacing:-.6px;color:#f3f1ff}
+.planning-summary p{margin:3px 0 0;color:#828593;font-size:calc(10px * var(--font-scale))}
 
 .critical-path-list{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;align-items:center;gap:10px}
 .critical-path-list li{display:flex;align-items:center;gap:10px}
 .critical-path-list li>div{padding:10px 12px;border:1px solid #2c2e39;border-radius:8px;background:#191a22;display:grid;gap:3px}
-.critical-path-list li strong{font-size:12px}
-.critical-path-list li span{font-size:9px;color:#797c89}
-.critical-path-arrow{color:#7653db;font-size:16px}
+.critical-path-list li strong{font-size:calc(12px * var(--font-scale))}
+.critical-path-list li span{font-size:calc(9px * var(--font-scale));color:#797c89}
+.critical-path-arrow{color:#7653db;font-size:calc(16px * var(--font-scale))}
 
 .planning-goal-list{display:grid;gap:12px;margin-bottom:16px}
 .planning-goal-card{padding:16px;border:1px solid #2c2e39;border-radius:10px;background:#191a22}
 .planning-goal-card.no-next-action{border-color:#4a2f2f}
 .planning-goal-card header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-.planning-goal-card header h3{margin:6px 0 0;font-size:14px}
-.planning-flag{padding:4px 8px;border-radius:999px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;background:#3a1a1f;color:#f18b96}
+.planning-goal-card header h3{margin:6px 0 0;font-size:calc(14px * var(--font-scale))}
+.planning-flag{padding:4px 8px;border-radius:999px;font-size:calc(9px * var(--font-scale));font-weight:700;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;background:#3a1a1f;color:#f18b96}
 .planning-flag.stale{background:#332a12;color:#e2b25a}
 .planning-link-list{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
 .planning-link-list li{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:10px;border:1px solid #262832;border-radius:7px;background:#20212a}
-.planning-link-list li>div{display:grid;gap:4px;font-size:11px}
-.planning-link-list li strong{font-size:12px}
-.planning-link-list li>div>span{color:#9295a3;font-size:10px}
-.planning-blocked-reason{color:#f18b96;font-size:9px;display:block}
-.planning-stale-reason{color:#e2b25a;font-size:9px;display:block}
-.planning-empty-note{color:#797c89;font-size:11px;margin:8px 0}
+.planning-link-list li>div{display:grid;gap:4px;font-size:calc(11px * var(--font-scale))}
+.planning-link-list li strong{font-size:calc(12px * var(--font-scale))}
+.planning-link-list li>div>span{color:#9295a3;font-size:calc(10px * var(--font-scale))}
+.planning-blocked-reason{color:#f18b96;font-size:calc(9px * var(--font-scale));display:block}
+.planning-stale-reason{color:#e2b25a;font-size:calc(9px * var(--font-scale));display:block}
+.planning-empty-note{color:#797c89;font-size:calc(11px * var(--font-scale));margin:8px 0}
 
 .planning-link-form{margin-top:14px;padding-top:14px;border-top:1px solid #2b2d38}
 .planning-link-form-row{display:flex;flex-wrap:wrap;align-items:end;gap:10px}
-.planning-link-form label{display:grid;gap:6px;color:#8e919f;font-size:9px;text-transform:uppercase}
-.planning-link-form input,.planning-link-form select{border:1px solid #393b47;border-radius:6px;background:#20212a;color:#dddde5;padding:8px 9px;font:inherit;font-size:11px}
+.planning-link-form label{display:grid;gap:6px;color:#8e919f;font-size:calc(9px * var(--font-scale));text-transform:uppercase}
+.planning-link-form input,.planning-link-form select{border:1px solid #393b47;border-radius:6px;background:#20212a;color:#dddde5;padding:8px 9px;font:inherit;font-size:calc(11px * var(--font-scale))}
 
 .planning-risk-list{display:grid;gap:12px}
 .planning-risk-card{padding:14px 16px;border:1px solid #2c2e39;border-radius:10px;background:#191a22}
 .planning-risk-card header{display:flex;align-items:center;gap:8px}
-.planning-risk-card ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:4px;color:#c7c9d3;font-size:11px}
+.planning-risk-card ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:4px;color:#c7c9d3;font-size:calc(11px * var(--font-scale))}
 
 .planning-suggestion-list{display:grid;gap:10px}
 .planning-suggestion-card{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px;border:1px solid #2c2e39;border-radius:10px;background:#191a22}
-.planning-suggestion-card strong{font-size:12px}
-.planning-suggestion-card span{color:#9295a3;font-size:10px;margin-left:6px}
-.planning-suggestion-card p{margin:5px 0 0;color:#797c89;font-size:10px}
+.planning-suggestion-card strong{font-size:calc(12px * var(--font-scale))}
+.planning-suggestion-card span{color:#9295a3;font-size:calc(10px * var(--font-scale));margin-left:6px}
+.planning-suggestion-card p{margin:5px 0 0;color:#797c89;font-size:calc(10px * var(--font-scale))}
 
 .planning-dependency-list{list-style:none;margin:0 0 6px;padding:0;display:grid;gap:8px}
 .planning-dependency-list li{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:10px;border:1px solid #262832;border-radius:7px;background:#20212a}
-.planning-dependency-list li p{margin:4px 0 0;color:#797c89;font-size:10px}
-.planning-dependency-list li span{color:#797c89;font-size:11px}
+.planning-dependency-list li p{margin:4px 0 0;color:#797c89;font-size:calc(10px * var(--font-scale))}
+.planning-dependency-list li span{color:#797c89;font-size:calc(11px * var(--font-scale))}
 
 @media(max-width:900px){.planning-summary{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:760px){.planning-link-form-row{flex-direction:column;align-items:stretch}.planning-suggestion-card{flex-direction:column;align-items:flex-start}}
