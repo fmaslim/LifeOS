@@ -85,13 +85,36 @@ writing straight to storage.
   is later required, in which case a scheduled export to a private Cloud Storage
   bucket can be added as a follow-up.
 - None of the above is provisioned by this issue; it is documented so the owner can
-  approve it explicitly before #155 (or a later issue) connects a real adapter.
+  approve it explicitly before the real adapter added in #155 is ever pointed at a
+  live Firestore project.
 
-## What's implemented here vs. deferred to #155
+## Runtime configuration (added by #155)
 
-| In this issue | Deferred to #155 |
-| --- | --- |
-| `MortgageRecord`, `MortgageValidator` | Authenticated HTTP endpoints |
-| `IMortgageRepository` contract | Real Firestore-backed adapter |
-| `InMemoryMortgageRepository` (test-only fake) | Wiring behind configuration, fail-closed when unconfigured |
-| Repository contract tests (validation, ownership isolation, concurrency, CRUD) | Endpoint-level auth/CRUD/conflict tests |
+`IMortgageRepository` is registered **only** when `Integrations:Finance:Firestore:ProjectId`
+is set (`Integrations__Finance__Firestore__ProjectId` as a Cloud Run env var / secret).
+`Integrations:Finance:Firestore:DatabaseId` is optional and defaults to `(default)`. No
+credential JSON is configured or needed: the Firestore client authenticates as the Cloud
+Run service's attached identity (Application Default Credentials), which is exactly why
+issue #153's service-account finding must be resolved first — until then, this should
+stay unset in production, and the endpoints will correctly return `503` rather than
+silently using a mock.
+
+Every mortgage endpoint is under `/api/finance/mortgages`, requires an authenticated
+owner session, and **state-changing requests (POST/PUT/DELETE) also require the
+`X-LifeOS-Client: web` header** — the explicit anti-CSRF control called for in the
+#153 audit. A plain cross-site HTML form cannot set a custom header, so this closes the
+gap the audit flagged as merely incidental. The frontend client added in #156 must set
+this header on every mutating request.
+
+## What's implemented across #154 and #155 vs. deferred to #156
+
+| #154 | #155 | Deferred to #156 |
+| --- | --- | --- |
+| `MortgageRecord`, `MortgageValidator` | `FirestoreMortgageRepository` (real adapter, behind configuration) | Mortgage form UI on the Finances page |
+| `IMortgageRepository` contract | `MortgageEndpoints` (auth + owner scoping + CSRF header + conflict/not-found handling) | Frontend service sending `X-LifeOS-Client: web` |
+| `InMemoryMortgageRepository` (test-only fake) | Fail-closed wiring in `Program.cs` (no repository registered when unconfigured) | Loading/empty/error/save-confirmation states |
+| Repository contract tests (validation, ownership isolation, concurrency, CRUD) | Endpoint-level tests (anonymous rejection, fail-closed, CRUD, validation, conflict, CSRF header) | UI/API contract + visual tests |
+
+No Firestore database, service account, or other cloud resource is provisioned by
+either #154 or #155 — both are still blocked on the owner approving the items in
+`docs/finance-security-audit.md` §4 before any real deployment.
