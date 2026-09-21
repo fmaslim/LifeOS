@@ -1,5 +1,7 @@
 using LifeOS.Api.Persistence;
 using LifeOS.Api.Auth;
+using LifeOS.Api.Finance;
+using LifeOS.Persistence.Tests;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
@@ -46,6 +48,7 @@ try
     await VerifyCredentialStatusNeverLeaksSecretValue();
     await VerifyCorsDeniesUnconfiguredOrigins();
     await VerifyLoginRejectsNonJsonBody();
+    await VerifyMortgageRepositoryContract();
     Console.WriteLine("Persistence foundation tests passed.");
 }
 finally
@@ -161,7 +164,73 @@ static async Task VerifyLoginRejectsNonJsonBody()
     Assert(response.StatusCode != HttpStatusCode.OK, "a form-encoded login body (the shape a cross-site form submission would send) must never authenticate");
 }
 
+static async Task VerifyMortgageRepositoryContract()
+{
+    var timeProvider = new FakeTimeProvider(new DateTimeOffset(2026, 9, 21, 12, 0, 0, TimeSpan.Zero));
+    IMortgageRepository repository = new InMemoryMortgageRepository(timeProvider);
+
+    MortgageRecord Valid(string id, string ownerId = "owner-a") => new(
+        id, ownerId, timeProvider.GetUtcNow(), "Test St mortgage", 250_000.00m, 5.5m, 1_650.00m, new DateOnly(2026, 9, 1));
+
+    // Validation: monetary, rate, and date bounds are rejected before anything is stored.
+    var negativeBalance = await repository.UpsertAsync("owner-a", Valid("m-negative") with { CurrentBalance = -1m }, null);
+    Assert(negativeBalance.Status == MortgageWriteStatus.Invalid, "a negative balance must be rejected");
+
+    var rateTooHigh = await repository.UpsertAsync("owner-a", Valid("m-rate") with { AnnualInterestRatePercent = 101m }, null);
+    Assert(rateTooHigh.Status == MortgageWriteStatus.Invalid, "a rate above 100 percent must be rejected");
+
+    var negativePayment = await repository.UpsertAsync("owner-a", Valid("m-payment") with { MonthlyPrincipalAndInterest = -1m }, null);
+    Assert(negativePayment.Status == MortgageWriteStatus.Invalid, "a negative monthly payment must be rejected");
+
+    var futureAsOf = await repository.UpsertAsync("owner-a", Valid("m-future") with { AsOfDate = new DateOnly(2026, 9, 22) }, null);
+    Assert(futureAsOf.Status == MortgageWriteStatus.Invalid, "an as-of date in the future must be rejected");
+
+    var blankLabel = await repository.UpsertAsync("owner-a", Valid("m-label") with { Label = "  " }, null);
+    Assert(blankLabel.Status == MortgageWriteStatus.Invalid, "a blank label must be rejected");
+
+    var mismatchedOwner = await repository.UpsertAsync("owner-a", Valid("m-mismatch", ownerId: "owner-b"), null);
+    Assert(mismatchedOwner.Status == MortgageWriteStatus.Invalid, "a record whose owner id does not match the caller must be rejected");
+
+    Assert((await repository.ListAsync("owner-a")).Count == 0, "no invalid record should have been persisted");
+
+    // Create.
+    var created = await repository.UpsertAsync("owner-a", Valid("m-1"), null);
+    Assert(created.Status == MortgageWriteStatus.Created && created.Record is not null, "a valid mortgage should be created");
+
+    var duplicateCreate = await repository.UpsertAsync("owner-a", Valid("m-1"), null);
+    Assert(duplicateCreate.Status == MortgageWriteStatus.Conflict, "creating over an existing id without an expected version must conflict");
+
+    // Ownership isolation: a second owner cannot see or affect the first owner's record.
+    await repository.UpsertAsync("owner-b", Valid("m-1", ownerId: "owner-b"), null);
+    Assert((await repository.ListAsync("owner-a")).Count == 1, "owner A must only see their own mortgage");
+    Assert((await repository.ListAsync("owner-b")).Count == 1, "owner B must only see their own mortgage");
+    Assert(await repository.GetAsync("owner-b", "m-1") is not null, "owner B can read their own record");
+    var crossOwnerDelete = await repository.DeleteAsync("owner-a", "does-not-belong-to-owner-a");
+    Assert(!crossOwnerDelete, "deleting a nonexistent id under another owner must not succeed");
+
+    // Optimistic concurrency.
+    var current = await repository.GetAsync("owner-a", "m-1");
+    Assert(current is not null, "the created record should be readable");
+    var staleUpdate = await repository.UpsertAsync("owner-a", current! with { CurrentBalance = 249_000m }, current.UpdatedAt.AddMinutes(-5));
+    Assert(staleUpdate.Status == MortgageWriteStatus.Conflict, "an update against a stale expected version must conflict");
+
+    var missingUpdate = await repository.UpsertAsync("owner-a", Valid("does-not-exist"), timeProvider.GetUtcNow());
+    Assert(missingUpdate.Status == MortgageWriteStatus.NotFound, "updating a nonexistent record must report not-found");
+
+    var updated = await repository.UpsertAsync("owner-a", current with { CurrentBalance = 249_000m, UpdatedAt = timeProvider.GetUtcNow().AddMinutes(1) }, current.UpdatedAt);
+    Assert(updated.Status == MortgageWriteStatus.Updated && updated.Record?.CurrentBalance == 249_000m, "an update against the correct expected version should succeed");
+
+    // Delete.
+    Assert(await repository.DeleteAsync("owner-a", "m-1"), "deleting an existing record should succeed");
+    Assert(await repository.GetAsync("owner-a", "m-1") is null, "a deleted record should no longer be readable");
+}
+
 static void Assert(bool condition, string message)
 {
     if (!condition) throw new InvalidOperationException(message);
+}
+
+sealed class FakeTimeProvider(DateTimeOffset now) : TimeProvider
+{
+    public override DateTimeOffset GetUtcNow() => now;
 }
