@@ -4,7 +4,9 @@ using LifeOS.Api.Finance;
 using LifeOS.Persistence.Tests;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Net.Http;
@@ -49,6 +51,9 @@ try
     await VerifyCorsDeniesUnconfiguredOrigins();
     await VerifyLoginRejectsNonJsonBody();
     await VerifyMortgageRepositoryContract();
+    await VerifyMortgageEndpointsFailClosedWhenUnconfigured();
+    await VerifyMortgageEndpointsRejectAnonymousAccess();
+    await VerifyMortgageEndpointsCrudAuthAndValidation();
     Console.WriteLine("Persistence foundation tests passed.");
 }
 finally
@@ -223,6 +228,134 @@ static async Task VerifyMortgageRepositoryContract()
     // Delete.
     Assert(await repository.DeleteAsync("owner-a", "m-1"), "deleting an existing record should succeed");
     Assert(await repository.GetAsync("owner-a", "m-1") is null, "a deleted record should no longer be readable");
+}
+
+static async Task VerifyMortgageEndpointsFailClosedWhenUnconfigured()
+{
+    // No Integrations:Finance:Firestore:ProjectId is set, so Program.cs never registers
+    // IMortgageRepository at all - the endpoints must fail closed, not fall back silently.
+    await using var factory = new WebApplicationFactory<LifeOS.Api.ApiAssemblyMarker>().WithWebHostBuilder(builder =>
+        builder.UseContentRoot(Path.GetFullPath("backend/LifeOS.Api", Directory.GetCurrentDirectory()))
+            .UseSetting("Auth:OwnerPassword", "test-owner-password")
+            .UseSetting("Auth:SigningKey", "test-only-signing-key-that-is-at-least-thirty-two-bytes"));
+
+    using var client = await SignedInClient(factory, "test-owner-password");
+    var response = await client.GetAsync("/api/finance/mortgages/");
+    Assert(response.StatusCode == HttpStatusCode.ServiceUnavailable, "an unconfigured mortgage store must fail closed with 503, never a mock list");
+}
+
+static async Task VerifyMortgageEndpointsRejectAnonymousAccess()
+{
+    await using var factory = new WebApplicationFactory<LifeOS.Api.ApiAssemblyMarker>().WithWebHostBuilder(builder =>
+        builder.UseContentRoot(Path.GetFullPath("backend/LifeOS.Api", Directory.GetCurrentDirectory()))
+            .UseSetting("Auth:OwnerPassword", "test-owner-password")
+            .UseSetting("Auth:SigningKey", "test-only-signing-key-that-is-at-least-thirty-two-bytes")
+            .ConfigureTestServices(services => services.AddSingleton<IMortgageRepository>(new InMemoryMortgageRepository(TimeProvider.System))));
+
+    using var anonymous = factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+    Assert((await anonymous.GetAsync("/api/finance/mortgages/")).StatusCode == HttpStatusCode.Unauthorized, "anonymous list must be rejected");
+    Assert((await anonymous.PostAsJsonAsync("/api/finance/mortgages/", SampleRequest())).StatusCode == HttpStatusCode.Unauthorized, "anonymous create must be rejected");
+    Assert((await anonymous.PutAsJsonAsync("/api/finance/mortgages/any-id", SampleUpdateRequest(DateTimeOffset.UtcNow))).StatusCode == HttpStatusCode.Unauthorized, "anonymous update must be rejected");
+    Assert((await anonymous.DeleteAsync("/api/finance/mortgages/any-id")).StatusCode == HttpStatusCode.Unauthorized, "anonymous delete must be rejected");
+}
+
+static async Task VerifyMortgageEndpointsCrudAuthAndValidation()
+{
+    await using var factory = new WebApplicationFactory<LifeOS.Api.ApiAssemblyMarker>().WithWebHostBuilder(builder =>
+        builder.UseContentRoot(Path.GetFullPath("backend/LifeOS.Api", Directory.GetCurrentDirectory()))
+            .UseSetting("Auth:OwnerPassword", "test-owner-password")
+            .UseSetting("Auth:SigningKey", "test-only-signing-key-that-is-at-least-thirty-two-bytes")
+            .ConfigureTestServices(services => services.AddSingleton<IMortgageRepository>(new InMemoryMortgageRepository(TimeProvider.System))));
+
+    using var client = await SignedInClient(factory, "test-owner-password");
+
+    // CSRF guard: a write without the client header must be rejected even for a signed-in owner.
+    using (var withoutHeader = new HttpRequestMessage(HttpMethod.Post, "/api/finance/mortgages/") { Content = JsonContent.Create(SampleRequest()) })
+    {
+        var rejected = await client.SendAsync(withoutHeader);
+        Assert(rejected.StatusCode == HttpStatusCode.Forbidden, "a create request missing the X-LifeOS-Client header must be rejected");
+    }
+
+    // Invalid input is rejected and never stored.
+    using (var invalid = new HttpRequestMessage(HttpMethod.Post, "/api/finance/mortgages/") { Content = JsonContent.Create(SampleRequest() with { CurrentBalance = -5m }) })
+    {
+        invalid.Headers.Add("X-LifeOS-Client", "web");
+        var invalidResponse = await client.SendAsync(invalid);
+        Assert(invalidResponse.StatusCode == HttpStatusCode.BadRequest, "an invalid mortgage payload must be rejected with 400");
+    }
+    Assert((await client.GetFromJsonAsync<MortgageResponse[]>("/api/finance/mortgages/"))!.Length == 0, "no invalid record should have been stored");
+
+    // Create.
+    MortgageResponse created;
+    using (var create = new HttpRequestMessage(HttpMethod.Post, "/api/finance/mortgages/") { Content = JsonContent.Create(SampleRequest()) })
+    {
+        create.Headers.Add("X-LifeOS-Client", "web");
+        var createResponse = await client.SendAsync(create);
+        Assert(createResponse.StatusCode == HttpStatusCode.Created, "a valid mortgage should be created");
+        created = (await createResponse.Content.ReadFromJsonAsync<MortgageResponse>())!;
+        Assert(created.Label == "Test St mortgage" && created.CurrentBalance == 250_000.00m, "the created record should round-trip the submitted values");
+    }
+
+    var list = await client.GetFromJsonAsync<MortgageResponse[]>("/api/finance/mortgages/");
+    Assert(list!.Length == 1 && list[0].Id == created.Id, "the created mortgage should appear in the list");
+
+    var fetched = await client.GetFromJsonAsync<MortgageResponse>($"/api/finance/mortgages/{created.Id}");
+    Assert(fetched is not null && fetched.Id == created.Id, "the created mortgage should be readable by id");
+
+    // Update with a stale version conflicts.
+    using (var staleUpdate = new HttpRequestMessage(HttpMethod.Put, $"/api/finance/mortgages/{created.Id}") { Content = JsonContent.Create(SampleUpdateRequest(created.UpdatedAt.AddMinutes(-1))) })
+    {
+        staleUpdate.Headers.Add("X-LifeOS-Client", "web");
+        var staleResponse = await client.SendAsync(staleUpdate);
+        Assert(staleResponse.StatusCode == HttpStatusCode.Conflict, "updating with a stale expected version must return 409");
+    }
+
+    // Update with the correct version succeeds.
+    using (var update = new HttpRequestMessage(HttpMethod.Put, $"/api/finance/mortgages/{created.Id}") { Content = JsonContent.Create(SampleUpdateRequest(created.UpdatedAt) with { CurrentBalance = 249_500m }) })
+    {
+        update.Headers.Add("X-LifeOS-Client", "web");
+        var updateResponse = await client.SendAsync(update);
+        Assert(updateResponse.StatusCode == HttpStatusCode.OK, "updating with the correct expected version should succeed");
+        var updated = await updateResponse.Content.ReadFromJsonAsync<MortgageResponse>();
+        Assert(updated!.CurrentBalance == 249_500m, "the update should be reflected in the response");
+    }
+
+    // Updating a nonexistent id reports not-found.
+    using (var missing = new HttpRequestMessage(HttpMethod.Put, "/api/finance/mortgages/does-not-exist") { Content = JsonContent.Create(SampleUpdateRequest(DateTimeOffset.UtcNow)) })
+    {
+        missing.Headers.Add("X-LifeOS-Client", "web");
+        var missingResponse = await client.SendAsync(missing);
+        Assert(missingResponse.StatusCode == HttpStatusCode.NotFound, "updating a nonexistent mortgage must return 404");
+    }
+
+    // Delete without the client header is rejected; with it, succeeds; deleting again is not-found.
+    using (var deleteWithoutHeader = new HttpRequestMessage(HttpMethod.Delete, $"/api/finance/mortgages/{created.Id}"))
+    {
+        var rejected = await client.SendAsync(deleteWithoutHeader);
+        Assert(rejected.StatusCode == HttpStatusCode.Forbidden, "a delete request missing the X-LifeOS-Client header must be rejected");
+    }
+    using (var delete = new HttpRequestMessage(HttpMethod.Delete, $"/api/finance/mortgages/{created.Id}"))
+    {
+        delete.Headers.Add("X-LifeOS-Client", "web");
+        Assert((await client.SendAsync(delete)).StatusCode == HttpStatusCode.NoContent, "deleting an existing mortgage should succeed");
+    }
+    using (var deleteAgain = new HttpRequestMessage(HttpMethod.Delete, $"/api/finance/mortgages/{created.Id}"))
+    {
+        deleteAgain.Headers.Add("X-LifeOS-Client", "web");
+        Assert((await client.SendAsync(deleteAgain)).StatusCode == HttpStatusCode.NotFound, "deleting an already-deleted mortgage must return 404");
+    }
+}
+
+static MortgageRequest SampleRequest() => new("Test St mortgage", 250_000.00m, 5.5m, 1_650.00m, new DateOnly(2026, 9, 1));
+
+static MortgageUpdateRequest SampleUpdateRequest(DateTimeOffset expectedUpdatedAt) => new("Test St mortgage", 250_000.00m, 5.5m, 1_650.00m, new DateOnly(2026, 9, 1), expectedUpdatedAt);
+
+static async Task<HttpClient> SignedInClient(WebApplicationFactory<LifeOS.Api.ApiAssemblyMarker> factory, string password)
+{
+    var client = factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false, HandleCookies = true });
+    var login = await client.PostAsJsonAsync("/api/auth/login", new AuthEndpoints.LoginRequest(password));
+    Assert(login.StatusCode == HttpStatusCode.OK, "test setup: login must succeed before exercising a protected route");
+    return client;
 }
 
 static void Assert(bool condition, string message)

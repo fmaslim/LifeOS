@@ -1,4 +1,6 @@
+using Google.Cloud.Firestore;
 using LifeOS.Api.Auth;
+using LifeOS.Api.Finance;
 using LifeOS.Api.Integrations;
 using LifeOS.Api.Persistence;
 using Microsoft.AspNetCore.Authentication;
@@ -22,6 +24,22 @@ builder.Services.Configure<AuthOptions>(builder.Configuration.GetSection(AuthOpt
 builder.Services.AddSingleton<IAuthSessionService, HmacAuthSessionService>();
 builder.Services.AddSingleton<IApplicationRepository, JsonFileApplicationRepository>();
 builder.Services.AddHealthChecks().AddCheck<PersistenceHealthCheck>("persistence");
+
+// Mortgage storage fails closed by design: IMortgageRepository is registered only when
+// Firestore is explicitly configured. There is no mock/JSON-file fallback for real
+// financial data (see docs/finance-mortgage-firestore.md and the #153 security audit).
+var firestoreProjectId = builder.Configuration["Integrations:Finance:Firestore:ProjectId"];
+if (!string.IsNullOrWhiteSpace(firestoreProjectId))
+{
+    var firestoreDatabaseId = builder.Configuration["Integrations:Finance:Firestore:DatabaseId"];
+    builder.Services.AddSingleton(_ => new FirestoreDbBuilder
+    {
+        ProjectId = firestoreProjectId,
+        DatabaseId = string.IsNullOrWhiteSpace(firestoreDatabaseId) ? "(default)" : firestoreDatabaseId,
+    }.Build());
+    builder.Services.AddSingleton<IMortgageRepository>(services =>
+        new FirestoreMortgageRepository(services.GetRequiredService<FirestoreDb>(), services.GetRequiredService<TimeProvider>()));
+}
 builder.Services.AddAuthentication(LifeOSAuthenticationHandler.Scheme)
     .AddScheme<AuthenticationSchemeOptions, LifeOSAuthenticationHandler>(LifeOSAuthenticationHandler.Scheme, _ => { });
 builder.Services.AddAuthorization();
@@ -51,6 +69,7 @@ app.MapLifeOSSync();
 app.MapLifeOSCalendar();
 app.MapLifeOSDocIQ();
 app.MapLifeOSFinance();
+app.MapLifeOSMortgages();
 app.MapLifeOSHome();
 app.MapLifeOSEvents();
 
