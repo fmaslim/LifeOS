@@ -1,5 +1,6 @@
 import type { FinancesData, FinanceIcon } from '../models/finances'
 import { StatePanel } from './StatePanel'
+import { MortgagesPanel } from './MortgagesPanel'
 import './FinancesPage.css'
 
 type PageState = 'ready' | 'loading' | 'error'
@@ -24,5 +25,6 @@ export function FinancesPage({ data, icon: Icon, state = 'ready' }: FinancesPage
       <article className="panel finance-panel"><div className="panel-heading"><div><p className="eyebrow">Commitments</p><h2>Debt & financing</h2></div><button className="text-button">View all <Icon name="arrow" size={16} /></button></div><div className="debt-list">{data.debtPayments.map(debt => <article className="debt-row" key={debt.id}><div className="debt-row-top"><div><h3>{debt.name}</h3><p>{debt.balance} · Due {debt.due}</p></div><strong>{debt.payment}<span>/mo</span></strong></div><div className="debt-progress"><i className={debt.tone} style={{ width: `${debt.progress}%` }} /></div></article>)}</div></article>
     </section>
     <section className="panel finance-panel finance-activity"><div className="panel-heading"><div><p className="eyebrow">System log</p><h2>Recent activity</h2></div><button className="text-button">See all <Icon name="arrow" size={16} /></button></div><div className="finance-activity-list">{data.activity.length ? data.activity.map(activity => <article className="finance-activity-row" key={activity.id}><div className={`small-icon ${activity.tone}`}><Icon name={activity.icon} size={16} /></div><div><h3>{activity.title}</h3><p>{activity.description}</p></div><time>{activity.time}</time></article>) : <StatePanel kind="empty" title="No activity yet" description="Financial activity will appear here as it is recorded." />}</div></section>
+    <MortgagesPanel />
   </div>
 }
