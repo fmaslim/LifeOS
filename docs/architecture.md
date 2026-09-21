@@ -44,6 +44,15 @@ Do not import one workspace page into another or create a second global service 
 | Dashboard operations and widget preferences | Dashboard components | Browser local storage |
 | Seed/demo data | Mock service or `src/data` | Source controlled fallback |
 | Integration status | Provider service mock adapters | In memory; no accounts |
+| Mortgage records | `MortgageService` (real API, no mock) | Server-side (Firestore, behind config) via `/api/finance/mortgages`; component memory only on the client, cleared on sign-out |
+
+Mortgages are the first workspace state that is genuinely sensitive financial data and
+server-owned rather than client-owned: `MortgageService.ts` never reads or writes
+`localStorage`/`sessionStorage`, and drafts live in `MortgagesPanel`'s component state,
+which unmounts (and is discarded) when `AuthGate` returns to the signed-out view. See
+`docs/finance-security-audit.md` and `docs/finance-mortgage-firestore.md` before adding
+another feature that touches real financial data - the same server-only, no-local-cache
+pattern should be the default, not the `usePersistentState` one above.
 
 `storage/LocalStore.ts` writes `{ version: 1, value }` envelopes under the `lifeos:v1:` prefix. `usePersistentState` reads a seed once and writes changes through the store. Add shared keys to `storage/storageKeys.ts`; do not write raw local-storage keys from new code. Storage failures safely fall back to the in-memory experience.
 

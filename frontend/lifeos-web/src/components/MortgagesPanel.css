@@ -1,0 +1,26 @@
+.mortgages-panel{margin-top:17px}
+.mortgages-confirmation{margin:0 0 12px;padding:8px 12px;border-radius:7px;background:#1d3b2c;color:#8ee1b8;font-size:calc(11px * var(--font-scale));font-weight:650}
+.mortgage-form{margin-bottom:16px;padding:20px;border:1px solid #4a3d70;border-radius:10px;background:linear-gradient(110deg,#211d34,#191a22)}
+.mortgage-form-head{display:flex;justify-content:space-between;align-items:start;margin-bottom:16px}
+.mortgage-form-head h3{margin:0;font-size:calc(15px * var(--font-scale))}
+.mortgage-close{border:0;background:none;color:#afb0b9;font-size:calc(23px * var(--font-scale));line-height:1;cursor:pointer}
+.mortgage-form-errors{margin:0 0 14px;padding:10px 14px;border:1px solid #6b3350;border-radius:7px;background:#3a2030;color:#ffb3cf;font-size:calc(11px * var(--font-scale));display:grid;gap:4px}
+.mortgage-form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:12px 0}
+.mortgage-field{display:grid;gap:6px;color:#9295a3;font-size:calc(9px * var(--font-scale));font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.mortgage-field input{box-sizing:border-box;width:100%;border:1px solid #3a3c48;border-radius:6px;background:#20212a;color:#dddde4;font:inherit;font-size:calc(11px * var(--font-scale));letter-spacing:0;text-transform:none;padding:8px 9px}
+.mortgage-field input:focus-visible{outline:2px solid #c3b2ff;outline-offset:2px}
+.mortgage-form-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.mortgage-cancel{border:1px solid #424452;border-radius:6px;background:#20212a;color:#b9bbc6;padding:8px 11px;font:inherit;font-size:calc(11px * var(--font-scale));cursor:pointer}
+.mortgage-list{display:grid;gap:2px}
+.mortgage-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid #2b2d38}
+.mortgage-row:last-child{border:0}
+.mortgage-row-copy h3{margin:0 0 4px;font-size:calc(13px * var(--font-scale));font-weight:650}
+.mortgage-row-copy p{margin:0;color:#9295a3;font-size:calc(11px * var(--font-scale))}
+.mortgage-row-actions{display:flex;gap:14px;flex-shrink:0}
+.mortgage-delete{color:#ff9ab5}
+.mortgage-delete:hover{color:#ffb3c7}
+@media(max-width:760px){
+  .mortgage-form-grid{grid-template-columns:1fr}
+  .mortgage-row{flex-direction:column;align-items:start;gap:8px}
+  .mortgage-row-actions{align-self:flex-end}
+}
